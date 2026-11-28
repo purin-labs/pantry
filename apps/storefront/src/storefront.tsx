@@ -1231,23 +1231,23 @@ export class StorefrontApp extends React.Component<
   StorefrontState
 > {
   state: StorefrontState = { kind: "booting" };
-  readonly #client = new CommerceStorefrontClient({
+  private readonly client = new CommerceStorefrontClient({
     baseUrl: window.location.origin,
   });
-  #cafeLanguage = readCafeLanguage();
-  #kioskMode = false;
-  #cafeContactSubmitted = false;
+  private cafeLanguage = readCafeLanguage();
+  private kioskMode = false;
+  private cafeContactSubmitted = false;
   /** The pâtisserie site's cart drawer. */
-  #cartOpen = false;
-  #shippingFormSubmitted = false;
-  #hasPresentedPage = false;
-  #pollTimer: number | undefined;
-  #quoteTimer: number | undefined;
+  private cartOpen = false;
+  private shippingFormSubmitted = false;
+  private hasPresentedPage = false;
+  private pollTimer: number | undefined;
+  private quoteTimer: number | undefined;
 
   applySessionPresentation = (session: CommerceBuyerSessionV4): void => {
     const presentation =
       session.checkoutProfileConfiguration.presentationPolicy;
-    this.#cafeLanguage = languageFromLocale(presentation.locale);
+    this.cafeLanguage = languageFromLocale(presentation.locale);
     if (typeof document !== "undefined") {
       document.documentElement.lang = presentation.locale;
       document.title = `${presentation.merchantDisplayName} · Purin Checkout`;
@@ -1258,9 +1258,9 @@ export class StorefrontApp extends React.Component<
     document.title = `${this.props.config.name} · Purin Checkout`;
     document.documentElement.lang =
       this.props.config.kind === "cafe"
-        ? cafeInterfaceCopy(this.#cafeLanguage).htmlLanguage
+        ? cafeInterfaceCopy(this.cafeLanguage).htmlLanguage
         : "en";
-    this.#kioskMode = readKioskMode(
+    this.kioskMode = readKioskMode(
       this.props.config,
       window.location,
     );
@@ -1310,12 +1310,12 @@ export class StorefrontApp extends React.Component<
       previousState.kind !== this.state.kind &&
       statePresentsPageHeading(this.state)
     ) {
-      if (this.#hasPresentedPage) {
+      if (this.hasPresentedPage) {
         focusPageHeading();
       } else {
         scrollToLocationAnchor();
       }
-      this.#hasPresentedPage = true;
+      this.hasPresentedPage = true;
     }
     if (previousState !== this.state) {
       this.schedulePoll();
@@ -1330,8 +1330,8 @@ export class StorefrontApp extends React.Component<
   }
 
   async bootstrap(): Promise<void> {
-    this.#cafeContactSubmitted = false;
-    this.#shippingFormSubmitted = false;
+    this.cafeContactSubmitted = false;
+    this.shippingFormSubmitted = false;
     this.setState({ kind: "booting" });
     const config = this.props.config;
     const recovery = recoveryFromLocation(window.location);
@@ -1346,7 +1346,7 @@ export class StorefrontApp extends React.Component<
           kind: "order_access",
           message: invalidOrderAccessMessage(
             config.kind,
-            this.#cafeLanguage,
+            this.cafeLanguage,
             false,
           ),
         },
@@ -1354,7 +1354,7 @@ export class StorefrontApp extends React.Component<
       return;
     }
     if (recovery !== undefined) {
-      const order = await this.#client.recoverOrder(
+      const order = await this.client.recoverOrder(
         config.merchantId,
         config.storefrontId,
         recovery.checkoutId,
@@ -1369,7 +1369,7 @@ export class StorefrontApp extends React.Component<
               kind: "order_access",
               message: invalidOrderAccessMessage(
                 config.kind,
-                this.#cafeLanguage,
+                this.cafeLanguage,
                 false,
               ),
             },
@@ -1393,7 +1393,7 @@ export class StorefrontApp extends React.Component<
             kind: "order_access",
             message: invalidOrderAccessMessage(
               config.kind,
-              this.#cafeLanguage,
+              this.cafeLanguage,
               true,
             ),
           },
@@ -1485,7 +1485,7 @@ export class StorefrontApp extends React.Component<
       });
       return;
     }
-    const session = await this.#client.createSession(
+    const session = await this.client.createSession(
       config.merchantId,
       config.storefrontId,
       {
@@ -1503,7 +1503,7 @@ export class StorefrontApp extends React.Component<
       });
       return;
     }
-    const catalog = await this.#client.readCatalog(
+    const catalog = await this.client.readCatalog(
       config.merchantId,
       config.storefrontId,
       session.value.token,
@@ -1570,7 +1570,7 @@ export class StorefrontApp extends React.Component<
     const stored = readStoredCheckoutRecovery(config);
     if (stored === undefined) return { kind: "new_session" };
     this.applySessionPresentation(stored.session);
-    const catalog = await this.#client.readCatalog(
+    const catalog = await this.client.readCatalog(
       config.merchantId,
       config.storefrontId,
       stored.session.token,
@@ -1611,7 +1611,7 @@ export class StorefrontApp extends React.Component<
     }
     let cart: BuyerCartState = { kind: "absent" };
     if (stored.cart.kind === "active") {
-      const recoveredCart = await this.#client.readCart(
+      const recoveredCart = await this.client.readCart(
         config.merchantId,
         config.storefrontId,
         stored.cart.cartId,
@@ -1679,7 +1679,7 @@ export class StorefrontApp extends React.Component<
     catalog: CommerceBuyerCatalogV1,
     cart: Variant<BuyerCartState, "submitted">,
   ): Promise<BuyerContextRecovery> {
-    const checkout = await this.#client.readCheckout(
+    const checkout = await this.client.readCheckout(
       config.merchantId,
       config.storefrontId,
       cart.checkoutId,
@@ -1779,7 +1779,7 @@ export class StorefrontApp extends React.Component<
     quote:
       CommerceBuyerQuotedCheckoutV1 | CommerceBuyerQuotedShippingCheckoutV1,
   ): Promise<BuyerContextRecovery> {
-    const result = await this.#client.createPaymentSession(
+    const result = await this.client.createPaymentSession(
       config.merchantId,
       config.storefrontId,
       quote.checkoutId,
@@ -1803,7 +1803,7 @@ export class StorefrontApp extends React.Component<
     if (result.value.state === "unavailable") {
       return {
         kind: "failed",
-        message: `Payment collection is temporarily unavailable. Try again after ${formatDate(result.value.retryAfter, config.kind, this.#cafeLanguage)}.`,
+        message: `Payment collection is temporarily unavailable. Try again after ${formatDate(result.value.retryAfter, config.kind, this.cafeLanguage)}.`,
       };
     }
     return quote.schemaVersion === "commerce.buyer-quoted-checkout.v1"
@@ -1826,12 +1826,12 @@ export class StorefrontApp extends React.Component<
     const current = this.state;
     if (current.kind !== "catalog" || this.props.config.kind !== "cafe") return;
     if (!event.currentTarget.checkValidity()) {
-      this.#cafeContactSubmitted = true;
+      this.cafeContactSubmitted = true;
       focusFirstInvalidField(event.currentTarget);
       this.setState({ ...current, feedback: { kind: "none" } });
       return;
     }
-    this.#cafeContactSubmitted = false;
+    this.cafeContactSubmitted = false;
     const selection = cafeSelection(current.context.catalog, this.props.config);
     if (!selection.ok) {
       this.setState({
@@ -1932,7 +1932,7 @@ export class StorefrontApp extends React.Component<
     if (this.props.config.kind !== "cafe") return;
     const language = parseCafeLanguage(event.currentTarget.value);
     if (language === undefined) return;
-    this.#cafeLanguage = language;
+    this.cafeLanguage = language;
     saveCafeLanguage(language);
     document.documentElement.lang = cafeInterfaceCopy(language).htmlLanguage;
     this.forceUpdate();
@@ -2188,7 +2188,7 @@ export class StorefrontApp extends React.Component<
       return;
     }
     this.setState({ kind: "quoting", context: current.context });
-    const result = await this.#client.refreshPickupCheckout(
+    const result = await this.client.refreshPickupCheckout(
       config.merchantId,
       config.storefrontId,
       current.quote.checkoutId,
@@ -2288,7 +2288,7 @@ export class StorefrontApp extends React.Component<
       return;
     }
     this.setState({ kind: "quoting", context });
-    const result = await this.#client.refreshShippingCheckout(
+    const result = await this.client.refreshShippingCheckout(
       config.merchantId,
       config.storefrontId,
       quote.checkoutId,
@@ -2358,7 +2358,7 @@ export class StorefrontApp extends React.Component<
       });
       return;
     }
-    const result = await this.#client.createPickupCheckout(
+    const result = await this.client.createPickupCheckout(
       config.merchantId,
       config.storefrontId,
       prepared.context.session.token,
@@ -2419,7 +2419,7 @@ export class StorefrontApp extends React.Component<
     }
     const result =
       context.cart.kind === "active"
-        ? await this.#client.replaceCart(
+        ? await this.client.replaceCart(
             config.merchantId,
             config.storefrontId,
             context.cart.cart.cartId,
@@ -2431,7 +2431,7 @@ export class StorefrontApp extends React.Component<
               lines,
             },
           )
-        : await this.#client.createCart(
+        : await this.client.createCart(
             config.merchantId,
             config.storefrontId,
             context.session.token,
@@ -2474,12 +2474,12 @@ export class StorefrontApp extends React.Component<
     if (current.context.basket.kind !== "shipping") return;
     const form = event.currentTarget;
     if (!form.checkValidity()) {
-      this.#shippingFormSubmitted = true;
+      this.shippingFormSubmitted = true;
       focusFirstInvalidField(form);
       this.setState({ ...current, feedback: { kind: "none" } });
       return;
     }
-    this.#shippingFormSubmitted = false;
+    this.shippingFormSubmitted = false;
     const selection = shippingSelection(
       current.context.catalog,
       current.context.basket,
@@ -2526,7 +2526,7 @@ export class StorefrontApp extends React.Component<
     if (config.kind !== "shipping" || context.basket.kind !== "shipping")
       return;
     this.setState({ kind: "quoting", context });
-    const result = await this.#client.validateShippingAddress(
+    const result = await this.client.validateShippingAddress(
       config.merchantId,
       config.storefrontId,
       context.session.token,
@@ -2599,7 +2599,7 @@ export class StorefrontApp extends React.Component<
           message: `Address validation is still being checked. Try again after ${formatDate(
             result.value.retryAfter,
             "shipping",
-            this.#cafeLanguage,
+            this.cafeLanguage,
           )}.`,
         });
         return;
@@ -2753,7 +2753,7 @@ export class StorefrontApp extends React.Component<
       });
       return;
     }
-    const result = await this.#client.createShippingCheckout(
+    const result = await this.client.createShippingCheckout(
       config.merchantId,
       config.storefrontId,
       prepared.context.session.token,
@@ -2826,7 +2826,7 @@ export class StorefrontApp extends React.Component<
   ): Promise<void> {
     this.setState({ kind: "paying_pickup", context, quote });
     saveOrderReceipt(
-      pickupReceipt(quote, context, this.props.config, this.#cafeLanguage),
+      pickupReceipt(quote, context, this.props.config, this.cafeLanguage),
     );
     const payment = await this.createPaymentSession(
       context,
@@ -2863,7 +2863,7 @@ export class StorefrontApp extends React.Component<
     VariantBy<CommerceBuyerPaymentSessionV1, "state", "ready"> | undefined
   > {
     const config = this.props.config;
-    const result = await this.#client.createPaymentSession(
+    const result = await this.client.createPaymentSession(
       config.merchantId,
       config.storefrontId,
       checkoutId,
@@ -2883,14 +2883,14 @@ export class StorefrontApp extends React.Component<
       }
       this.restoreQuoteWithError(
         context,
-        paymentSessionError(result.error, this.#cafeLanguage),
+        paymentSessionError(result.error, this.cafeLanguage),
       );
       return undefined;
     }
     if (result.value.state === "unavailable") {
       this.restoreQuoteWithError(
         context,
-        `Payment collection is temporarily unavailable. Try again after ${formatDate(result.value.retryAfter, this.props.config.kind, this.#cafeLanguage)}.`,
+        `Payment collection is temporarily unavailable. Try again after ${formatDate(result.value.retryAfter, this.props.config.kind, this.cafeLanguage)}.`,
       );
       return undefined;
     }
@@ -2957,7 +2957,7 @@ export class StorefrontApp extends React.Component<
     confirmation: CommercePaymentClientConfirmationV1,
   ): Promise<CommerceBuyerOrderRecoveryV1 | undefined> {
     const config = this.props.config;
-    const result = await this.#client.reconcilePayment(
+    const result = await this.client.reconcilePayment(
       config.merchantId,
       config.storefrontId,
       checkoutId,
@@ -3062,7 +3062,7 @@ export class StorefrontApp extends React.Component<
   ): Promise<void> {
     const config = this.props.config;
     const access = createOrderAccess(checkoutId, recovery.token);
-    const result = await this.#client.recoverOrder(
+    const result = await this.client.recoverOrder(
       config.merchantId,
       config.storefrontId,
       checkoutId,
@@ -3138,7 +3138,7 @@ export class StorefrontApp extends React.Component<
       await navigator.clipboard.writeText(current.access.returnUrl);
       const message =
         current.kind === "pickup_order"
-          ? cafeInterfaceCopy(this.#cafeLanguage).linkCopied
+          ? cafeInterfaceCopy(this.cafeLanguage).linkCopied
           : "Order link copied.";
       this.setState({ ...current, feedback: { kind: "notice", message } });
     } catch {
@@ -3173,7 +3173,7 @@ export class StorefrontApp extends React.Component<
     current: Variant<StorefrontState, "pickup_order" | "shipping_order">,
   ): Promise<void> {
     const config = this.props.config;
-    const result = await this.#client.recoverOrder(
+    const result = await this.client.recoverOrder(
       config.merchantId,
       config.storefrontId,
       current.access.checkoutId,
@@ -3225,12 +3225,12 @@ export class StorefrontApp extends React.Component<
     )
       return;
     if (!orderNeedsPolling(this.state.order)) return;
-    this.#pollTimer = window.setTimeout(this.refreshOrder, 4_000);
+    this.pollTimer = window.setTimeout(this.refreshOrder, 4_000);
   }
 
   cancelPoll(): void {
-    if (this.#pollTimer !== undefined) window.clearTimeout(this.#pollTimer);
-    this.#pollTimer = undefined;
+    if (this.pollTimer !== undefined) window.clearTimeout(this.pollTimer);
+    this.pollTimer = undefined;
   }
 
   scheduleQuoteExpiry(): void {
@@ -3246,7 +3246,7 @@ export class StorefrontApp extends React.Component<
       this.markQuoteExpired();
       return;
     }
-    this.#quoteTimer = window.setTimeout(this.markQuoteExpired, delay);
+    this.quoteTimer = window.setTimeout(this.markQuoteExpired, delay);
   }
 
   markQuoteExpired = (): void => {
@@ -3257,13 +3257,13 @@ export class StorefrontApp extends React.Component<
   };
 
   cancelQuoteTimer(): void {
-    if (this.#quoteTimer !== undefined) window.clearTimeout(this.#quoteTimer);
-    this.#quoteTimer = undefined;
+    if (this.quoteTimer !== undefined) window.clearTimeout(this.quoteTimer);
+    this.quoteTimer = undefined;
   }
 
   render(): React.ReactNode {
     const orderStatusHref = this.orderStatusHref();
-    const cafeCopy = cafeInterfaceCopy(this.#cafeLanguage);
+    const cafeCopy = cafeInterfaceCopy(this.cafeLanguage);
     const showingOrderStatus =
       this.state.kind === "pickup_order" ||
       this.state.kind === "shipping_order";
@@ -3281,7 +3281,7 @@ export class StorefrontApp extends React.Component<
       this.props.config.kind === "cafe" &&
       this.props.config.presentation === "menu";
     // The cart drawer belongs to the menu; a checkout or an order closes it.
-    if (this.state.kind !== "catalog") this.#cartOpen = false;
+    if (this.state.kind !== "catalog") this.cartOpen = false;
     // An order page (`menu.<domain>/<shop name>/` or `/shops/<merchantId>`)
     // links to its own path.
     const homeHref = orderPage
@@ -3324,7 +3324,7 @@ export class StorefrontApp extends React.Component<
                 <span className="sr-only">{cafeCopy.languageLabel}</span>
                 <select
                   aria-label={cafeCopy.languageLabel}
-                  value={this.#cafeLanguage}
+                  value={this.cafeLanguage}
                   onChange={this.changeCafeLanguage}
                 >
                   <option value="en">English</option>
@@ -3380,7 +3380,7 @@ export class StorefrontApp extends React.Component<
                 : "Shipping, duty, and tax shown before payment · Prices in JPY"}
             </p>
             <a href="#main">
-              {this.props.config.kind === "cafe" && this.#cafeLanguage === "ja"
+              {this.props.config.kind === "cafe" && this.cafeLanguage === "ja"
                 ? "ページ上部へ"
                 : "Back to top"}
             </a>
@@ -3405,7 +3405,7 @@ export class StorefrontApp extends React.Component<
     switch (this.state.kind) {
       case "booting": {
         const label =
-          this.#cafeLanguage === "ja"
+          this.cafeLanguage === "ja"
             ? "本日のメニューを読み込んでいます"
             : "Loading today’s menu";
         return this.props.config.kind === "cafe" &&
@@ -3418,7 +3418,7 @@ export class StorefrontApp extends React.Component<
       case "failed": {
         const copy = failureViewCopy(
           this.props.config.kind,
-          this.#cafeLanguage,
+          this.cafeLanguage,
           this.state.failure.kind,
         );
         return (
@@ -3442,7 +3442,7 @@ export class StorefrontApp extends React.Component<
         return (
           <CheckoutSkeleton
             label={
-              this.#cafeLanguage === "ja"
+              this.cafeLanguage === "ja"
                 ? "ご注文の内容を準備しています"
                 : "Preparing your order"
             }
@@ -3493,7 +3493,7 @@ export class StorefrontApp extends React.Component<
         return (
           <StatusView
             title="Payment is still being checked"
-            detail={`Try again after ${formatDate(this.state.reconcileAfter, this.props.config.kind, this.#cafeLanguage)}. The same payment request will be reconciled safely.`}
+            detail={`Try again after ${formatDate(this.state.reconcileAfter, this.props.config.kind, this.cafeLanguage)}. The same payment request will be reconciled safely.`}
             actionLabel="Check payment again"
             onAction={this.pay}
           />
@@ -3517,7 +3517,7 @@ export class StorefrontApp extends React.Component<
         ? state.context.basket
         : initialCafeBasket();
     const hasItems = cafeBasketHasItems(basket);
-    const copy = cafeInterfaceCopy(this.#cafeLanguage);
+    const copy = cafeInterfaceCopy(this.cafeLanguage);
     const contactPolicy = buyerContactPolicy(state.context.session);
     const shopName = config.showcase
       ? config.name
@@ -3640,7 +3640,7 @@ export class StorefrontApp extends React.Component<
                     </div>
                   </section>
                   <CafeFlavorMenu
-                    copy={CAFE_FLAVOR_MENU_COPY[this.#cafeLanguage]}
+                    copy={CAFE_FLAVOR_MENU_COPY[this.cafeLanguage]}
                     showcase={config.showcase}
                   />
                 </section>
@@ -3666,7 +3666,7 @@ export class StorefrontApp extends React.Component<
                     {cafeBasketLines(
                       basket,
                       selection.value,
-                      this.#cafeLanguage,
+                      this.cafeLanguage,
                       copy,
                       this.decreaseCafeQuantity,
                       this.increaseCafeQuantity,
@@ -3689,7 +3689,7 @@ export class StorefrontApp extends React.Component<
                   onSubmit={this.createCafeQuote}
                 >
                   <p className="basket-footnote">
-                    {buyerContactPolicyCopy(contactPolicy, this.#cafeLanguage)}
+                    {buyerContactPolicyCopy(contactPolicy, this.cafeLanguage)}
                   </p>
                   <FormField
                     id="cafeEmail"
@@ -3698,7 +3698,7 @@ export class StorefrontApp extends React.Component<
                     autoComplete="email"
                     placeholder="name@example.com"
                     error={contactFieldError(
-                      this.#cafeContactSubmitted,
+                      this.cafeContactSubmitted,
                       "email",
                       basket.buyerContact.email,
                       contactPolicy,
@@ -3720,7 +3720,7 @@ export class StorefrontApp extends React.Component<
                       placeholder="+819012345678"
                       hint="Include + and the country code."
                       error={contactFieldError(
-                        this.#cafeContactSubmitted,
+                        this.cafeContactSubmitted,
                         "phone",
                         basket.buyerContact.phone,
                         contactPolicy,
@@ -3741,7 +3741,7 @@ export class StorefrontApp extends React.Component<
                 </form>
               </aside>,
             )}
-            {hasItems && !this.#cartOpen ? (
+            {hasItems && !this.cartOpen ? (
               <MobileCheckoutBar
                 count={cafeBasketItemCount(basket)}
                 label={copy.basketHeading}
@@ -3768,12 +3768,12 @@ export class StorefrontApp extends React.Component<
     basket: React.ReactNode,
   ): React.ReactNode {
     if (config.presentation !== "patisserie") return basket;
-    const copy = cafeInterfaceCopy(this.#cafeLanguage);
+    const copy = cafeInterfaceCopy(this.cafeLanguage);
     return (
       <CartDrawer
-        open={this.#cartOpen}
+        open={this.cartOpen}
         label={copy.basketHeading}
-        closeLabel={this.#cafeLanguage === "ja" ? "閉じる" : "Close"}
+        closeLabel={this.cafeLanguage === "ja" ? "閉じる" : "Close"}
         onClose={this.closeCart}
       >
         {basket}
@@ -3782,12 +3782,12 @@ export class StorefrontApp extends React.Component<
   }
 
   openCart = (): void => {
-    this.#cartOpen = true;
+    this.cartOpen = true;
     this.forceUpdate();
   };
 
   closeCart = (): void => {
-    this.#cartOpen = false;
+    this.cartOpen = false;
     this.forceUpdate();
   };
 
@@ -3807,7 +3807,7 @@ export class StorefrontApp extends React.Component<
         quantity: cafeBasketQuantity(basket, product.config.menuEntryId),
       });
     }
-    const copy = cafeInterfaceCopy(this.#cafeLanguage);
+    const copy = cafeInterfaceCopy(this.cafeLanguage);
     const orderStatusHref = this.orderStatusHref();
     return (
       <section
@@ -3818,15 +3818,15 @@ export class StorefrontApp extends React.Component<
           <h1 id="cafe-order-heading" tabIndex={-1}>
             {shopName}
           </h1>
-          <p>{patisserieMastheadDetail(this.#cafeLanguage)}</p>
+          <p>{patisserieMastheadDetail(this.cafeLanguage)}</p>
         </header>
         <PatisserieMenu
-          language={this.#cafeLanguage}
+          language={this.cafeLanguage}
           items={items}
           shopNav={{
             cartLabel: copy.basketHeading,
             cartCount: cafeBasketItemCount(basket),
-            cartOpen: this.#cartOpen,
+            cartOpen: this.cartOpen,
             onOpenCart: this.openCart,
             ...(orderStatusHref === undefined
               ? {}
@@ -3944,7 +3944,7 @@ export class StorefrontApp extends React.Component<
     /** The menu section's name; the demo shows drinks or bakes. */
     category?: string,
   ): React.ReactNode {
-    const productCopy = cafeItemCopy(this.#cafeLanguage, product.config);
+    const productCopy = cafeItemCopy(this.cafeLanguage, product.config);
     const quantity = cafeBasketQuantity(basket, product.config.menuEntryId);
     const preparation = cafeProductPreparation(
       copy,
@@ -3992,7 +3992,7 @@ export class StorefrontApp extends React.Component<
             product.config.menuEntryId,
           )}
           disabled={product.entry.availability === "unavailable"}
-          language={this.#cafeLanguage}
+          language={this.cafeLanguage}
           label={
             product.config.flavor === "menu"
               ? product.entry.modifierGroups
@@ -4145,7 +4145,7 @@ export class StorefrontApp extends React.Component<
               {deliveryAvailable ? (
                 <>
                   <p className="basket-footnote">
-                    {buyerContactPolicyCopy(contactPolicy, this.#cafeLanguage)}
+                    {buyerContactPolicyCopy(contactPolicy, this.cafeLanguage)}
                   </p>
                   <FormField
                     id="shippingEmail"
@@ -4154,7 +4154,7 @@ export class StorefrontApp extends React.Component<
                     autoComplete="email"
                     placeholder="name@example.com"
                     error={contactFieldError(
-                      this.#shippingFormSubmitted,
+                      this.shippingFormSubmitted,
                       "email",
                       basket.buyerContact.email,
                       contactPolicy,
@@ -4176,7 +4176,7 @@ export class StorefrontApp extends React.Component<
                       placeholder="+819012345678"
                       hint="Include + and the country code."
                       error={contactFieldError(
-                        this.#shippingFormSubmitted,
+                        this.shippingFormSubmitted,
                         "phone",
                         basket.buyerContact.phone,
                         contactPolicy,
@@ -4191,7 +4191,7 @@ export class StorefrontApp extends React.Component<
                     label="Recipient name"
                     autoComplete="shipping name"
                     error={shippingFieldError(
-                      this.#shippingFormSubmitted,
+                      this.shippingFormSubmitted,
                       "recipientName",
                       basket.address,
                     )}
@@ -4203,7 +4203,7 @@ export class StorefrontApp extends React.Component<
                     label="Street address"
                     autoComplete="shipping address-line1"
                     error={shippingFieldError(
-                      this.#shippingFormSubmitted,
+                      this.shippingFormSubmitted,
                       "addressLine1",
                       basket.address,
                     )}
@@ -4216,7 +4216,7 @@ export class StorefrontApp extends React.Component<
                       label={countryCopy.localityLabel}
                       autoComplete="shipping address-level2"
                       error={shippingFieldError(
-                        this.#shippingFormSubmitted,
+                        this.shippingFormSubmitted,
                         "locality",
                         basket.address,
                       )}
@@ -4230,7 +4230,7 @@ export class StorefrontApp extends React.Component<
                       label={countryCopy.areaLabel}
                       autoComplete="shipping address-level1"
                       error={shippingFieldError(
-                        this.#shippingFormSubmitted,
+                        this.shippingFormSubmitted,
                         "administrativeArea",
                         basket.address,
                       )}
@@ -4246,7 +4246,7 @@ export class StorefrontApp extends React.Component<
                     pattern={countryCopy.postalPattern}
                     hint={countryCopy.postalHint}
                     error={shippingFieldError(
-                      this.#shippingFormSubmitted,
+                      this.shippingFormSubmitted,
                       "postalCode",
                       basket.address,
                     )}
@@ -4438,7 +4438,7 @@ export class StorefrontApp extends React.Component<
   renderPickupQuote(
     state: Variant<StorefrontState, "pickup_quote">,
   ): React.ReactNode {
-    const copy = cafeInterfaceCopy(this.#cafeLanguage);
+    const copy = cafeInterfaceCopy(this.cafeLanguage);
     const merchantDisplayName =
       state.context.session.checkoutProfileConfiguration.presentationPolicy
         .merchantDisplayName;
@@ -4468,7 +4468,7 @@ export class StorefrontApp extends React.Component<
             label: copy.pickupAt.replace("{name}", merchantDisplayName),
             value: formatPickupMoment(
               state.quote.quote.pickup.readyAt,
-              this.#cafeLanguage,
+              this.cafeLanguage,
             ),
           },
         ]}
@@ -4477,7 +4477,7 @@ export class StorefrontApp extends React.Component<
           state.context.catalog,
           this.props.config,
           copy,
-          this.#cafeLanguage,
+          this.cafeLanguage,
         )}
         totals={state.quote.quote.totals}
         expired={state.expired}
@@ -4555,17 +4555,17 @@ export class StorefrontApp extends React.Component<
   renderPickupOrder(
     state: Variant<StorefrontState, "pickup_order">,
   ): React.ReactNode {
-    const copy = cafeInterfaceCopy(this.#cafeLanguage);
+    const copy = cafeInterfaceCopy(this.cafeLanguage);
     const basePresentation: OrderStatusPresentation = {
       title: cafeOrderTitle(state.order.state, copy),
-      detail: pickupOrderDetail(state.order, this.#cafeLanguage),
-      nextAction: pickupOrderNextAction(state.order, this.#cafeLanguage),
-      timeline: pickupOrderTimeline(state.order, this.#cafeLanguage),
+      detail: pickupOrderDetail(state.order, this.cafeLanguage),
+      nextAction: pickupOrderNextAction(state.order, this.cafeLanguage),
+      timeline: pickupOrderTimeline(state.order, this.cafeLanguage),
       complete: state.order.state === "completed",
     };
     const paymentReview = paymentReviewPresentation(
       state.order.paymentDisputes,
-      this.#cafeLanguage,
+      this.cafeLanguage,
     );
     return (
       <OrderView
@@ -4582,13 +4582,13 @@ export class StorefrontApp extends React.Component<
         }
         lastUpdated={
           basePresentation.lastUpdated ??
-          buyerOrderLastUpdated(state.order, this.#cafeLanguage)
+          buyerOrderLastUpdated(state.order, this.cafeLanguage)
         }
         nextAction={basePresentation.nextAction}
         timeline={orderTimelineWithPaymentReview(
           basePresentation,
           paymentReview,
-          this.#cafeLanguage,
+          this.cafeLanguage,
         )}
         paymentReview={paymentReview}
         receipt={readOrderReceipt(state.access.checkoutId)}
@@ -4600,7 +4600,7 @@ export class StorefrontApp extends React.Component<
         onCopyLink={this.copyOrderLink}
         copy={cafeOrderViewCopy(copy)}
         handoff={
-          this.#kioskMode
+          this.kioskMode
             ? {
                 kind: "pickup_kiosk",
                 heading: copy.kioskHeading,
@@ -4652,7 +4652,7 @@ export class StorefrontApp extends React.Component<
     };
     const paymentReview = paymentReviewPresentation(
       order.paymentDisputes,
-      this.#cafeLanguage,
+      this.cafeLanguage,
     );
     return (
       <OrderView
@@ -4667,12 +4667,12 @@ export class StorefrontApp extends React.Component<
         complete={
           basePresentation.complete && !(paymentReview?.active ?? false)
         }
-        lastUpdated={buyerOrderLastUpdated(order, this.#cafeLanguage)}
+        lastUpdated={buyerOrderLastUpdated(order, this.cafeLanguage)}
         nextAction={basePresentation.nextAction}
         timeline={orderTimelineWithPaymentReview(
           basePresentation,
           paymentReview,
-          this.#cafeLanguage,
+          this.cafeLanguage,
         )}
         paymentReview={paymentReview}
         facts={facts}
