@@ -274,7 +274,7 @@ export function limitationSentence(
 ): string {
   switch (limitation) {
     case "tool_attempt_unrecorded":
-      return "No record says which attempt of a turn ran a tool operation. Tool operations are linked to their turn.";
+      return "An older tool operation does not name the attempt that ran it. It is linked to its turn only.";
     case "effect_attempts_unrecorded":
       return "A governed effect keeps its latest state only. Each try to run it is not recorded.";
     case "delivery_attempts_unrecorded":
@@ -378,6 +378,10 @@ export function nodeFacts(
 ): readonly Readonly<{ label: string; value: string; time?: number }>[] {
   const time = (label: string, value: number | null) =>
     value === null ? [] : [{ label, value: "", time: value }];
+  const attemptOf = (label: string, generation: number | null) =>
+    generation === null
+      ? []
+      : [{ label, value: `Attempt ${String(generation)}` }];
   switch (node.kind) {
     case "trigger":
       return [
@@ -414,7 +418,11 @@ export function nodeFacts(
         { label: "Tool", value: node.tool },
         { label: "Call", value: node.callId },
         ...time("Called", node.startedAt),
+        ...attemptOf("Called in", node.generation),
         ...time("Result accepted", node.settledAt),
+        ...(node.settledGeneration === node.generation
+          ? []
+          : attemptOf("Result accepted in", node.settledGeneration)),
         ...(node.receiptId === null
           ? []
           : [{ label: "Receipt", value: node.receiptId }]),

@@ -624,7 +624,12 @@ export function projectSessionRecords(
   for (const operation of session.toolOperations) {
     const guard = guardOfTurn.get(operation.turnId);
     if (guard === undefined) continue;
-    limitations.add("tool_attempt_unrecorded");
+    // An entry from before the Session recorded attempts names none.
+    if (
+      operation.generation === null ||
+      (operation.settledAt !== null && operation.settledGeneration === null)
+    )
+      limitations.add("tool_attempt_unrecorded");
     const node = key.tool(sessionId, operation.turnId, operation.callId);
     tools.add(node);
     nodes.push({

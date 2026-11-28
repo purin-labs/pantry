@@ -180,6 +180,8 @@ const OPEN_NODES: readonly CaseExecutionNode[] = [
     settledAt: AT + 2 * MINUTE + 4_000,
     authority: "read",
     receiptId: null,
+    generation: 2,
+    settledGeneration: 2,
   },
   {
     nodeId: "s2.turn",
@@ -216,6 +218,8 @@ const OPEN_NODES: readonly CaseExecutionNode[] = [
     settledAt: AT + 2 * MINUTE + 2_000,
     authority: "read",
     receiptId: null,
+    generation: 1,
+    settledGeneration: 1,
   },
   {
     nodeId: "s3.turn",
@@ -252,6 +256,8 @@ const OPEN_NODES: readonly CaseExecutionNode[] = [
     settledAt: AT + 7 * MINUTE,
     authority: "provider_effect",
     receiptId: "receipt_preview_proposal",
+    generation: 1,
+    settledGeneration: 1,
   },
 ];
 
@@ -437,6 +443,8 @@ function longCase(): Readonly<{
         settledAt: AT + 2 * MINUTE + call * 5_000 + 1_200,
         authority: "read",
         receiptId: null,
+        generation: 1,
+        settledGeneration: 1,
       });
       edges.push({
         from: `${name}.turn`,

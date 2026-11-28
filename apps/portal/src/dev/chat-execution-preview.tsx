@@ -197,6 +197,8 @@ function previewNodes(settled: boolean): readonly CaseExecutionNode[] {
     settledAt: settled ? 4 : null,
     authority: "read",
     receiptId: null,
+    generation: 1,
+    settledGeneration: settled ? 1 : null,
   };
   const command: CaseExecutionNode = {
     access: "open",
@@ -211,6 +213,8 @@ function previewNodes(settled: boolean): readonly CaseExecutionNode[] {
     settledAt: settled ? 3 : null,
     authority: "code_execution",
     receiptId: null,
+    generation: 1,
+    settledGeneration: settled ? 1 : null,
   };
   const commerce: readonly CaseExecutionNode[] = [
     {

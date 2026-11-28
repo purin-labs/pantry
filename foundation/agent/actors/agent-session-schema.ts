@@ -5,6 +5,7 @@ import {
   type SchemaMigrationPlan,
 } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
+  addHarnessHistoryRuntimeGeneration,
   createSessionHarnessAuthoritySchema,
   SESSION_HARNESS_CHECKPOINT_COLUMNS,
   SESSION_HARNESS_HISTORY_COLUMNS,
@@ -35,6 +36,7 @@ export function initializeAgentSessionPersistence(
   sql: SqlStorage,
 ): AgentSessionPersistence {
   runSchemaMigrations(sql, SESSION_SCHEMA_PLAN, (operation) => operation());
+  addHarnessHistoryRuntimeGeneration(sql);
   runSessionOutboxSchemaMigrations(sql);
   runTurnContinuationSchemaMigrations(sql);
   return { kind: "v33_canonical" };

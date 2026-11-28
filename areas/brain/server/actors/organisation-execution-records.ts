@@ -1,4 +1,8 @@
-import { isNonNegativeInteger, isRecord, parseJsonOrNull } from "@purin-labs/std";
+import {
+  isNonNegativeInteger,
+  isRecord,
+  parseJsonOrNull,
+} from "@purin-labs/std";
 import type { CaseExecutionEffectState } from "@purin-labs/control-api";
 import type {
   CaseExecutionEffectRecord,
@@ -59,10 +63,6 @@ function effectRecord(row: Row): CaseExecutionEffectRecord[] {
     !isNonNegativeInteger(row.updated_at)
   )
     return [];
-  const result =
-    typeof row.provider_result === "string"
-      ? parseJsonOrNull(row.provider_result)
-      : null;
   return [
     {
       actionNonce: row.nonce,
@@ -70,17 +70,33 @@ function effectRecord(row: Row): CaseExecutionEffectRecord[] {
       state,
       recordedAt: row.created_at,
       updatedAt: row.updated_at,
-      receipt:
-        isRecord(result) &&
-        typeof result.receiptId === "string" &&
-        typeof result.status === "string" &&
-        isNonNegativeInteger(result.observedAt)
-          ? {
-              receiptId: result.receiptId,
-              status: result.status,
-              observedAt: result.observedAt,
-            }
+      receipt: storedReceipt(
+        typeof row.provider_result === "string"
+          ? parseJsonOrNull(row.provider_result)
           : null,
+      ),
     },
   ];
+}
+
+/**
+ * The receipt that the ledger keeps for a settled action: the provider's
+ * receipt identity, its status and the time it was observed. The ledger
+ * stores that time as the provider wrote it, an ISO text. A result of another
+ * shape, such as the evidence of a failure, is no receipt.
+ */
+function storedReceipt(result: unknown): CaseExecutionEffectRecord["receipt"] {
+  if (
+    !isRecord(result) ||
+    typeof result.receiptId !== "string" ||
+    typeof result.status !== "string"
+  )
+    return null;
+  const observedAt =
+    typeof result.observedAt === "string"
+      ? Date.parse(result.observedAt)
+      : result.observedAt;
+  return isNonNegativeInteger(observedAt)
+    ? { receiptId: result.receiptId, status: result.status, observedAt }
+    : null;
 }

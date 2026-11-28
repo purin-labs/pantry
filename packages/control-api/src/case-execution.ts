@@ -193,6 +193,19 @@ export type OpenCaseExecutionNode = Readonly<{ access: "open" }> &
           settledAt: number | null;
           authority: CaseExecutionToolAuthority | null;
           receiptId: string | null;
+          /**
+           * The attempt that accepted the call: the runtime generation of
+           * its attempt node. Null for a call that was accepted before the
+           * Session recorded the attempt of each history entry.
+           */
+          generation: number | null;
+          /**
+           * The attempt that accepted the result. It differs from
+           * `generation` when the call's attempt was interrupted before its
+           * result was accepted. Null with no result, and for a result that
+           * was accepted before the Session recorded attempts.
+           */
+          settledGeneration: number | null;
         }>)
     | (NodeIdentity<"proposal"> &
         Readonly<{
@@ -266,7 +279,10 @@ export type CaseExecutionEdge = Readonly<{
  * could not be read. The reader must not assume the missing link.
  */
 export type CaseExecutionLimitation =
-  /** No record says which attempt of a turn ran a tool operation. */
+  /**
+   * A tool operation accepted before the Session recorded attempts names
+   * none. No record says which attempt of its turn ran it.
+   */
   | "tool_attempt_unrecorded"
   /** A governed effect keeps its latest state only, not each execution try. */
   | "effect_attempts_unrecorded"
@@ -690,6 +706,8 @@ function parseOpenNode(
         "settledAt",
         "authority",
         "receiptId",
+        "generation",
+        "settledGeneration",
       ]) &&
         identifier(raw.sessionId) &&
         identifier(raw.turnId) &&
@@ -701,7 +719,10 @@ function parseOpenNode(
         isNonNegativeInteger(raw.startedAt) &&
         timeOrNull(raw.settledAt) &&
         (raw.authority === null || oneOf(TOOL_AUTHORITIES, raw.authority)) &&
-        identifierOrNull(raw.receiptId)
+        identifierOrNull(raw.receiptId) &&
+        (raw.generation === null || isPositiveInteger(raw.generation)) &&
+        (raw.settledGeneration === null ||
+          (raw.settledAt !== null && isPositiveInteger(raw.settledGeneration)))
         ? {
             ...base,
             kind: "tool_operation",
@@ -714,6 +735,8 @@ function parseOpenNode(
             settledAt: raw.settledAt,
             authority: raw.authority,
             receiptId: raw.receiptId,
+            generation: raw.generation,
+            settledGeneration: raw.settledGeneration,
           }
         : null;
     case "proposal":

@@ -3,6 +3,7 @@ import {
   steeringInputAccepts,
 } from "./harness-steering";
 import { clearPiDurableTables } from "./pi-durable-checkpoint";
+import { addMissingColumn } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import type {
   AcceptedHarnessEventCursor,
   EmbeddedHarnessBackendId,
@@ -367,6 +368,20 @@ export type HarnessCheckpointPublication =
       readonly harnessLease?: never;
     };
 
+/**
+ * A history table from before Plan 42J has no `runtime_generation`. An entry
+ * of such a table keeps a null: no record says which attempt accepted it. A
+ * table that has the column changes nothing, so a start writes nothing.
+ */
+export function addHarnessHistoryRuntimeGeneration(sql: SqlStorage): void {
+  addMissingColumn(
+    sql,
+    "session_harness_history",
+    "runtime_generation",
+    "INTEGER",
+  );
+}
+
 export function createSessionHarnessAuthoritySchema(sql: SqlStorage): void {
   sql.exec(
     `CREATE TABLE IF NOT EXISTS session_harness_lease (
@@ -455,6 +470,9 @@ export function createSessionHarnessAuthoritySchema(sql: SqlStorage): void {
         byte_length >= 0 AND byte_length <= ${MAX_DELIVERY_SEGMENT_BYTES}
       ),
       accepted_at INTEGER NOT NULL CHECK (accepted_at >= 0),
+      runtime_generation INTEGER CHECK (
+        runtime_generation IS NULL OR runtime_generation >= 1
+      ),
       PRIMARY KEY (session_id, sequence)
     )`,
   );
@@ -1481,10 +1499,14 @@ function appendHarnessHistoryTransaction(
     return { ok: false, error: budget };
   }
   sql.exec(
+    // The entry names the attempt that accepted it: the runtime generation of
+    // the lease it was accepted under (Plan 42J). The digest chain does not
+    // cover it, so a later attempt that sends the same entry again finds the
+    // first acceptance unchanged.
     `INSERT INTO session_harness_history (
        organisation_id, session_id, turn_id, sequence, previous_digest, entry_digest,
-       payload, byte_length, accepted_at
-     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       payload, byte_length, accepted_at, runtime_generation
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, json_extract(?, '$.runtimeLease.generation'))`,
     lease.organisation_id,
     input.sessionId,
     input.turn.turnId,
@@ -1494,6 +1516,7 @@ function appendHarnessHistoryTransaction(
     payload,
     byteLength,
     input.acceptedAt,
+    lease.lease_projection,
   );
   sql.exec(
     `INSERT INTO session_harness_usage (

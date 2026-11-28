@@ -200,6 +200,10 @@ export type SessionToolOperationRecord = Readonly<{
   settledAt: number | null;
   authority: CaseExecutionToolAuthority | null;
   receiptId: string | null;
+  /** The runtime generation that accepted the call, when it is recorded. */
+  generation: number | null;
+  /** The runtime generation that accepted the result, when it is recorded. */
+  settledGeneration: number | null;
 }>;
 
 /** What the governed action ledger holds for one action of the Case. */

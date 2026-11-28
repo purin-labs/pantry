@@ -1,4 +1,9 @@
-import { isNonNegativeInteger, isRecord, parseJsonOrNull } from "@purin-labs/std";
+import {
+  isNonNegativeInteger,
+  isPositiveInteger,
+  isRecord,
+  parseJsonOrNull,
+} from "@purin-labs/std";
 import type {
   CaseExecutionToolAuthority,
   CaseExecutionTurnMemory,
@@ -42,8 +47,10 @@ const TOOL_AUTHORITIES: readonly CaseExecutionToolAuthority[] = [
  * end has a time here: the journal's time for a completion is the one its
  * caller set when the turn was accepted, and the turn stream copies it. A
  * tool operation is a tool call of the
- * accepted history, joined to its result by the call identity. The history
- * does not say which attempt made a call, so none is given.
+ * accepted history, joined to its result by the call identity. Each history
+ * entry names the runtime generation that accepted it, so a call and its
+ * result each name their attempt. An entry from before that record names
+ * none.
  *
  * The Memory result of a turn is the outcome its accepted context records.
  * Only its kind, its reason and the count of its revisions leave this read.
@@ -300,7 +307,7 @@ export function readSessionExecutionRecords(
 
   const results = sql
     .exec<Row>(
-      `SELECT turn_id, accepted_at,
+      `SELECT turn_id, accepted_at, runtime_generation,
          json_extract(payload, '$.entry.callId') AS call_id,
          json_extract(payload, '$.entry.outcome.kind') AS outcome,
          json_extract(payload, '$.entry.authority.kind') AS authority,
@@ -327,7 +334,7 @@ export function readSessionExecutionRecords(
       settled.set(JSON.stringify([row.turn_id, row.call_id]), row);
   const calls = sql
     .exec<Row>(
-      `SELECT h.turn_id, h.accepted_at,
+      `SELECT h.turn_id, h.accepted_at, h.runtime_generation,
          json_extract(c.value, '$.callId') AS call_id,
          json_extract(c.value, '$.tool') AS tool
        FROM session_harness_history h, json_each(h.payload, '$.entry.content') c
@@ -373,6 +380,12 @@ export function readSessionExecutionRecords(
         authority: authority ?? null,
         receiptId:
           typeof result?.receipt_id === "string" ? result.receipt_id : null,
+        generation: isPositiveInteger(row.runtime_generation)
+          ? row.runtime_generation
+          : null,
+        settledGeneration: isPositiveInteger(result?.runtime_generation)
+          ? result.runtime_generation
+          : null,
       },
     ];
   });

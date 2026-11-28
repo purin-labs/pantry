@@ -231,8 +231,15 @@ export type OngoingCaseTurnInput = Omit<
       };
 };
 
+/**
+ * The Session of a participant of a two-session trigger. It also answers for
+ * a turn that it ran before this delivery.
+ */
+export type TwoSessionCaseSession = CaseWalkingSession &
+  Pick<SessionActor, "inspectTurnStream" | "readCompletedTurn">;
+
 type CaseParticipantInput = {
-  readonly session: CaseWalkingSession;
+  readonly session: TwoSessionCaseSession;
   readonly requestId: RequestId;
   readonly sessionId: SessionId;
   readonly assignmentId: string;
@@ -836,14 +843,20 @@ export async function runDirectTwoSessionCasePath(
       prepared.value.snapshot,
     );
     if (!resumed.ok) return resumed;
-    if (hasActiveCaseAssignment(prepared.value.snapshot)) {
-      return failure("case_assignment_in_progress");
+    let snapshot = prepared.value.snapshot;
+    if (hasActiveCaseAssignment(snapshot)) {
+      const finished = await finishStoppedTwoSessionTurns(input, snapshot);
+      if (!finished.ok) return finished;
+      if (!finished.value) return failure("case_assignment_in_progress");
+      const current = await input.caseActor.inspect();
+      if (!current.ok) return failure(current.error.code);
+      snapshot = current.value;
     }
     // An earlier delivery of this trigger ended after both participants and
     // before the combined assignment began. This delivery runs it.
     if (
       input.combined !== undefined &&
-      combinedAssignmentOwed(prepared.value.snapshot, input, input.combined)
+      combinedAssignmentOwed(snapshot, input, input.combined)
     ) {
       const combined = await runCombinedCaseSession(
         input,
@@ -922,6 +935,90 @@ export async function runDirectTwoSessionCasePath(
       finalCaseRevision: finalSnapshot.value.revision,
     },
   };
+}
+
+/**
+ * A delivery of a two-session trigger whose earlier delivery stopped while a
+ * turn ran (Plan 42J). The Session's own recovery finishes such a turn under
+ * a new attempt, and nothing else gives its answer to the Case. This delivery
+ * reads each completed turn of its own running assignments and finishes the
+ * assignment with it: the proposal, the delivery and the settlement. False:
+ * an assignment stays active, because its turn still runs or failed, it
+ * never began, or it belongs to another trigger. The Case's alarm ends an
+ * assignment that nothing moves.
+ */
+async function finishStoppedTwoSessionTurns(
+  input: DirectTwoSessionCasePathInput,
+  snapshot: CaseSnapshot,
+): Promise<Result<boolean, CaseWalkingPathError>> {
+  const own = [
+    ...input.participants,
+    ...(input.combined === undefined ? [] : [input.combined.participant]),
+  ];
+  let finished = true;
+  for (const lifecycle of snapshot.assignmentLifecycles) {
+    if (lifecycle.kind === "settled") continue;
+    const participant = own.find(
+      (candidate) =>
+        candidate.assignmentId === lifecycle.assignment.assignmentId,
+    );
+    const turnId =
+      participant === undefined
+        ? null
+        : `turn_${participantInputId(input, participant)}`;
+    if (
+      participant === undefined ||
+      turnId === null ||
+      lifecycle.kind !== "running" ||
+      lifecycle.start.startId !== `start_${turnId}`
+    ) {
+      finished = false;
+      continue;
+    }
+    const state = await participant.session.inspectTurnStream({
+      organisationId: input.organisationId,
+      turnId,
+    });
+    if (!state.ok) return failure(state.error.code);
+    if (state.value.kind !== "present" || state.value.state !== "complete") {
+      finished = false;
+      continue;
+    }
+    if (
+      input.turnAuthority.authorityPartition.digest !==
+      lifecycle.assignment.authorityPartition.digest
+    )
+      return failure("case_authority_partition_changed");
+    const completion = await participant.session.readCompletedTurn({
+      organisationId: input.organisationId,
+      sessionId: participant.sessionId,
+      turnId,
+    });
+    if (!completion.ok) return failure(completion.error.code);
+    const finalized = await finalizeAssignedCaseSession(
+      {
+        env: input.env,
+        caseActor: input.caseActor,
+        turnAuthority: input.turnAuthority,
+        receivedAt: lifecycle.start.acceptedAt,
+        delivery: sessionDelivery(input.delivery),
+        revalidateTurnAuthority: input.revalidateTurnAuthority,
+      },
+      lifecycle.assignment,
+      turnId,
+      completion.value,
+    );
+    if (!finalized.ok) return finalized;
+  }
+  return { ok: true, value: finished };
+}
+
+/** Names a participant's one input of a two-session trigger. */
+function participantInputId(
+  input: Pick<DirectTwoSessionCasePathInput, "triggerId">,
+  participant: Pick<CaseParticipantInput, "inputKey" | "role">,
+): string {
+  return `${input.triggerId}_${participant.inputKey ?? participant.role}`;
 }
 
 /**
@@ -2004,7 +2101,7 @@ function directParticipantSessionInput(
     requestId: participant.requestId,
     sessionId: participant.sessionId,
     caseId: input.caseId,
-    inputId: `${input.triggerId}_${participant.inputKey ?? participant.role}`,
+    inputId: participantInputId(input, participant),
     assignmentId: participant.assignmentId,
     purpose: input.purpose,
     principal: input.principal,

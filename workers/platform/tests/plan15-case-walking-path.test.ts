@@ -67,6 +67,7 @@ import {
   runOngoingCaseTurn as executeOngoingCaseTurn,
   admitOngoingCaseTurn,
   type CaseWalkingSession,
+  type TwoSessionCaseSession,
   type OngoingCaseTurnInput as AdmittedOngoingCaseTurnInput,
   type OngoingCaseWalkingConnector,
   type OngoingCaseWalkingSession,
@@ -1682,8 +1683,8 @@ function directCueInput(caseActor: CaseDO, session: CaseWalkingSession) {
 
 function directKonbiniInput(
   caseActor: CaseDO,
-  coordinator: CaseWalkingSession,
-  specialist: CaseWalkingSession,
+  coordinator: TwoSessionCaseSession,
+  specialist: TwoSessionCaseSession,
 ) {
   const single = directCueInput(caseActor, coordinator);
   return {
@@ -1836,6 +1837,17 @@ function exhaustedSession(): OngoingCaseWalkingSession {
   };
 }
 
+async function runningTurnStream(): Promise<{
+  readonly ok: true;
+  readonly value: { readonly kind: "present"; readonly state: "running" };
+}> {
+  return { ok: true, value: { kind: "present", state: "running" } };
+}
+
+async function noCompletedTurn(): Promise<never> {
+  throw new Error("No delivery reads a turn that still runs");
+}
+
 async function missingTurnStream(): Promise<{
   readonly ok: true;
   readonly value: { readonly kind: "missing" };
@@ -1853,7 +1865,7 @@ function ongoingSession(
 }
 
 function controlledSession(message: string): {
-  readonly value: CaseWalkingSession;
+  readonly value: TwoSessionCaseSession;
   readonly started: Promise<void>;
   complete(): void;
   fail(error: unknown): void;
@@ -1891,6 +1903,10 @@ function controlledSession(message: string): {
           value: { flowBinding: await fixtureSerializedFlowBinding(input) },
         };
       },
+      // The turn of this Session runs until the test completes it, and the
+      // delivery that started it takes its answer.
+      inspectTurnStream: runningTurnStream,
+      readCompletedTurn: noCompletedTurn,
       async startCanonicalEmbeddedHarnessTextTurn(input) {
         markStarted?.();
         if (sessionId === null) throw new Error("session was not initialized");

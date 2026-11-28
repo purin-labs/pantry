@@ -214,8 +214,12 @@ records one Memory outcome.
   `attempt`, `tool_operation`, `proposal`, `approval`, `effect` and `delivery`. A node
   is `open` or withheld. A withheld node shows its kind and its edges only.
 - An edge has a recorded basis: `context_entry`, `assignment`, `turn`, `tool_call`,
-  `proposal` or `action`. Timestamps give no edge. The page lists each link that the
-  records do not hold as a limitation: `tool_attempt_unrecorded`,
+  `proposal` or `action`. Timestamps give no edge. A tool operation names the attempt
+  that accepted its call (`generation`) and the attempt that accepted its result
+  (`settledGeneration`), from the runtime generation that each entry of the Session's
+  history records. The page lists each link that the
+  records do not hold as a limitation: `tool_attempt_unrecorded` (a tool operation
+  from before that record),
   `effect_attempts_unrecorded`, `delivery_attempts_unrecorded`,
   `mail_proposal_origin_unrecorded`, `proposal_tool_call_unrecorded`,
   `session_unavailable`, `effect_unavailable`, `truncated` or `record_invalid`.
@@ -379,10 +383,10 @@ last try named: `indeterminate`, `failed` or `unavailable`.
 - A Memory that cites a mailbox Case entry, and no reviewed reply, has no review
   surface in the Portal.
 - An Eval tries only `mailbox_reply`. A person cannot open an Eval.
-- The execution records lack fields: the attempt that ran a tool operation, each try of
-  an effect and of a delivery, and the turn or tool call of a mail reply proposal.
-- The Evals journey has not run on the real Codex route, and no execution journey holds
-  every step in one Case.
+- The execution records lack fields: each try of an effect and of a delivery, and the
+  turn or tool call of a mail reply proposal.
+- An Eval task on the ChatGPT subscription route ends as `unavailable`: that route has
+  no Gmail model review, so no mail content goes to it.
 
 ## Sources
 
@@ -402,6 +406,6 @@ last try named: `indeterminate`, `failed` or `unavailable`.
 accepted Memory` and `compares the accepted and a candidate Memory`),
   `chat-execution.test.ts`, `chat-shared-runtime.test.ts`,
   `portal-chat-finalization.test.ts`, `pi-sdk-effect.test.ts`,
-  `pi-sdk-combined-proposal.test.ts`, `slack-case-title.test.ts`,
+  `case-execution-journey.test.ts`, `slack-case-title.test.ts`,
   `commerce-lab.test.ts` and `schedule-runs.test.ts`.
 - The browser journey of the Brain pages: `scripts/plan-42J/run-browser.py`.
