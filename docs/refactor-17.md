@@ -359,7 +359,14 @@ since 2026-11-23, and that commit is in production since 10:29 UTC of that day
   The Platform Worker is the folder `workers/platform`; `apps/portal` stays the
   Portal build (decision of the owner, 2026-11-23).
 
-The open work, each item with its own decision:
+**Complete on 2026-11-28 (decision of the owner).** The CI run 46081154523 on `dev`
+`b2fd98c5` passed. The owner decided that the 13 area components that the Portal shell
+and the chat page import stay as they are (`surface-nonpublic` 14), and that the
+refactor is complete with the items below as they are: the outbox table step is "Not
+now", `env-merge` 16 is the design, and `contract-runtime` 94 is allowed. Each count
+may not grow. Refactor 10 can read the 13 imports again when it splits the large files.
+
+The items, each with its own decision:
 
 | Item                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Cost                                                                                                                                                                                                                                                                                                                                                                                                                  | Default                                                            |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
