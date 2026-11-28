@@ -32,11 +32,16 @@ import {
   repinJevMailClassification,
 } from "./mail-switch";
 import {
-  JEV_PAID_USE_OPEN,
+  jevSpendingLimitReached,
   readJevPaidSpendMinor,
   readJevPaidUse,
+  readJevPaymentAccount,
+  readJevPlan,
   writeJevPaidUse,
+  writeJevPaymentAccount,
+  type JevPaymentAccount,
 } from "./paid-use";
+import { stripeBillingConfig } from "@purin-labs/area-organisation-contract/server/billing/stripe-client";
 import {
   readJevScreenRelevance,
   writeJevScreenRelevance,
@@ -62,6 +67,16 @@ export interface OrganisationJevRpc {
   /** Paid use above the free use (Plan 88 section 4). The route admits only the owner. */
   manageJevPaidUse(input: JevCommandInput): Promise<unknown>;
   manageJevFeature(input: JevCommandInput): Promise<unknown>;
+  /**
+   * Stores the payment state of the billing account, for the admission of
+   * paid use (Plan 95 step 6). The billing webhook calls it on a change.
+   */
+  syncJevPaymentAccount(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      account: JevPaymentAccount;
+    }>,
+  ): Promise<Result<Readonly<{ changed: boolean }>, { code: string }>>;
 }
 
 /** What the Organisation actor gives to the Jev settings. */
@@ -105,6 +120,12 @@ export async function readJevFeaturesForOrganisation(
     sql,
     scope.organisationId,
   ).policy;
+  const paidUse = readJevPaidUse(sql, scope.organisationId);
+  const spentMinor = readJevPaidSpendMinor(
+    sql,
+    scope.organisationId,
+    Date.now(),
+  );
   return {
     ok: true,
     value: {
@@ -134,13 +155,14 @@ export async function readJevFeaturesForOrganisation(
           ? jevAllowanceView(sql, scope.organisationId, Date.now())
           : null,
       paidUse: {
-        ...readJevPaidUse(sql, scope.organisationId),
-        spentMinor: readJevPaidSpendMinor(
-          sql,
-          scope.organisationId,
-          Date.now(),
-        ),
-        priced: JEV_PAID_USE_OPEN,
+        ...paidUse,
+        spentMinor,
+        limitReached:
+          paidUse.enabled &&
+          jevSpendingLimitReached(spentMinor, paidUse.spendingLimitMinor),
+        highestSpendingLimitMinor: readJevPlan(sql).highestSpendingLimitMinor,
+        // Paid use is open when this deployment bills through Stripe.
+        priced: stripeBillingConfig(host.env) !== null,
       },
     },
   };
@@ -158,10 +180,22 @@ export async function manageJevPaidUseForOrganisation(
   const command = parseJevPaidUseCommand(input.body);
   if (command === null)
     return { ok: false, error: { code: "jev_paid_use_invalid" } };
-  // Paid use is closed until Pantry's own billing (Plan 95 step 6).
-  if (command.enabled && !JEV_PAID_USE_OPEN)
-    return { ok: false, error: { code: "jev_paid_use_closed" } };
-  if (!(await isOrganisationExecutionActive(host.storage.sql, scope)))
+  const sql = host.storage.sql;
+  if (command.spendingLimitMinor > readJevPlan(sql).highestSpendingLimitMinor)
+    return { ok: false, error: { code: "jev_paid_use_invalid" } };
+  // To turn paid use on, this deployment must bill through Stripe, and the
+  // owner must have set up payment. To turn it off or to change the limit,
+  // neither is necessary.
+  if (command.enabled && !readJevPaidUse(sql, scope.organisationId).enabled) {
+    if (stripeBillingConfig(host.env) === null)
+      return { ok: false, error: { code: "jev_paid_use_closed" } };
+    if (
+      readJevPaymentAccount(sql, scope.organisationId).paymentState !==
+      "active"
+    )
+      return { ok: false, error: { code: "jev_payment_setup_required" } };
+  }
+  if (!(await isOrganisationExecutionActive(sql, scope)))
     return organisationPlacementConflict();
   host.storage.transactionSync(
     writeJevPaidUse.bind(null, host.storage.sql, {
@@ -173,6 +207,33 @@ export async function manageJevPaidUseForOrganisation(
     }),
   );
   return readJevFeaturesForOrganisation(host, scope);
+}
+
+/** Writes only on a change, so a repeated webhook writes nothing. */
+export async function syncJevPaymentAccountForOrganisation(
+  host: OrganisationJevHost,
+  input: Readonly<{
+    organisationId: OrganisationId;
+    account: JevPaymentAccount;
+  }>,
+  scope: OrganisationExecutionScope,
+): Promise<Result<Readonly<{ changed: boolean }>, { code: string }>> {
+  const organisation = host.validateOrganisation(scope.organisationId);
+  if (!organisation.ok) return organisation;
+  if (!(await isOrganisationExecutionActive(host.storage.sql, scope)))
+    return organisationPlacementConflict();
+  return {
+    ok: true,
+    value: {
+      changed: host.storage.transactionSync(
+        writeJevPaymentAccount.bind(null, host.storage.sql, {
+          organisationId: scope.organisationId,
+          account: input.account,
+          now: Date.now(),
+        }),
+      ),
+    },
+  };
 }
 
 export async function manageJevFeatureForOrganisation(

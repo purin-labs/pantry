@@ -437,6 +437,10 @@ function renderBilling(page: PageContext): React.ReactNode {
       key={state.organisation.organisation.organisationId}
       organisationId={state.organisation.organisation.organisationId}
       isOwner={state.organisation.membership.role === "owner"}
+      canRead={
+        state.organisation.membership.role === "owner" ||
+        state.organisation.membership.role === "admin"
+      }
       jevHref={workspacePagePath(
         state.organisation.membership.organisationHandle,
         state.workspace.workspaceHandle,

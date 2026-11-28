@@ -53,6 +53,14 @@ export const ORGANISATION_PURGE_ENTRIES = [
     statement: "DELETE FROM organisation_first_operational_task",
   },
   {
+    // The Stripe customer id names no person. The Stripe account keeps its
+    // own record of the customer and of each invoice.
+    order: 1275,
+    table: "organisation_billing_account",
+    action: "erase",
+    statement: "DELETE FROM organisation_billing_account",
+  },
+  {
     order: 1280,
     table: "organisation_activation_receipt",
     action: "erase",

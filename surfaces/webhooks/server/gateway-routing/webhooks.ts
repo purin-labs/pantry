@@ -3,6 +3,12 @@ import type { GatewayWebhookRoute } from "./domain";
 export function matchWebhookRoute(
   pathname: string,
 ): GatewayWebhookRoute | null {
+  // Pantry's own Stripe account bills the Organisations (Plan 95 step 6).
+  // The webhooks of the providers of a shop are under /hook/.
+  if (pathname === "/webhooks/stripe-billing") {
+    return { kind: "stripeBillingWebhook" };
+  }
+
   const segments = pathname.split("/");
   if (segments[0] !== "" || segments[1] !== "hook") {
     return null;

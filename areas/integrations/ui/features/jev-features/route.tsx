@@ -143,11 +143,7 @@ export function JevFeaturesRoute(props: {
     <div className="jev-page">
       <section className="jev-funding" aria-label="Who pays for Jev">
         <FundingLine view={view} integrationsHref={props.integrationsHref} />
-        <JevUsePrompt
-          view={view}
-          isOwner={isOwner}
-          turnOn={{ kind: "focus", onClick: focusPaidUse }}
-        />
+        <JevUsePrompt view={view} isOwner={isOwner} onTurnOn={focusPaidUse} />
       </section>
       {view.funding === "pantry_platform" ? (
         <PaidUseSection
@@ -244,12 +240,18 @@ function FundingLine(props: {
             The Purin key is not set. Jev calls stop until the key is set.
           </p>
         )}
-        {allowance?.reached === true ? (
+        {allowance?.reached !== true ? null : view.paidUse.enabled ? (
+          // The Paid use section says so when the payment or the limit stops it.
+          <p className="jev-muted" role="status">
+            The free use of this month is used. Paid use covers the Jev features
+            until {resetDate(allowance)}.
+          </p>
+        ) : (
           <p className="jev-warning" role="status">
             The free use of this month is used. Jev features pause until{" "}
             {resetDate(allowance)}.
           </p>
-        ) : null}
+        )}
       </>
     );
   }

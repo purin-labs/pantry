@@ -33,6 +33,7 @@ export const PERMISSION_REQUESTABLE = [
   CAPABILITY_KEYS.deviceCameraRead,
   CAPABILITY_KEYS.jevFeaturesRead,
   CAPABILITY_KEYS.jevFeaturesManage,
+  CAPABILITY_KEYS.billingAccountRead,
   CAPABILITY_KEYS.organisationLogoChange,
   CAPABILITY_KEYS.bakeRead,
   CAPABILITY_KEYS.bakePropose,

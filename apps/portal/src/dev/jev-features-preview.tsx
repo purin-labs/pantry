@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes } from "react-router";
+import type { BillingView } from "@purin-labs/control-api/portal/billing";
 import type { JevFeaturesView } from "@purin-labs/control-api/portal/jev-features";
 import "@purin-labs/surface-portal/ui/styles.css";
 import { BillingRoute } from "@purin-labs/area-organisation/ui/features/billing/route";
@@ -16,6 +17,8 @@ import { JevFeaturesRoute } from "@purin-labs/area-integrations/ui/features/jev-
 // - `used-viewer`: the free use used, paid use off, a viewer.
 // - `paid`: paid use on, $1.20 of $5.00, the owner.
 // - `unpriced`: paid use is not open yet (`priced: false`).
+// - `past-due`: paid use on and a failed payment, the owner.
+// - `admin`: an admin who is not the owner.
 // `?page=billing` opens Settings › Billing; `?theme=dark` sets the dark
 // appearance.
 const root = document.getElementById("root");
@@ -27,7 +30,7 @@ if (params.get("theme") === "dark")
 const previewCase = params.get("case") ?? "pantry";
 const viewer = previewCase === "viewer" || previewCase === "used-viewer";
 const admin = !viewer;
-const owner = !viewer;
+const owner = !viewer && previewCase !== "admin";
 const used = previewCase === "used" || previewCase === "used-viewer";
 // controlMutation reads the session's CSRF cookie before it sends.
 document.cookie = "pantry_csrf=preview";
@@ -76,16 +79,61 @@ let view: JevFeaturesView = {
           reached: used || previewCase === "paid",
         },
   paidUse: {
-    enabled: previewCase === "paid",
+    enabled: previewCase === "paid" || previewCase === "past-due",
     spendingLimitMinor: 500,
     spentMinor: previewCase === "paid" ? 120 : 0,
+    limitReached: false,
+    highestSpendingLimitMinor: 1_000,
     priced: previewCase !== "unpriced" && previewCase !== "own",
   },
 };
 
+/** Settings › Billing reads its own view of the same numbers. */
+function billingView(): BillingView {
+  return {
+    plan: {
+      id: "beta",
+      name: "Beta",
+      freeJevUseMicrousd: 1_000_000,
+      highestSpendingLimitMinor: 1_000,
+    },
+    open: view.paidUse.priced,
+    paymentState:
+      previewCase === "paid"
+        ? "active"
+        : previewCase === "past-due"
+          ? "past_due"
+          : "none",
+    freeUse:
+      view.allowance === null
+        ? null
+        : {
+            usedMicrousd: view.allowance.usedMicrousd,
+            limitMicrousd: view.allowance.limitMicrousd,
+            resetsAt: view.allowance.resetsAt,
+          },
+    paidUse: {
+      enabled: view.paidUse.enabled,
+      spentMinor: view.paidUse.spentMinor,
+      spendingLimitMinor: view.paidUse.spendingLimitMinor,
+      limitReached: view.paidUse.limitReached,
+    },
+  };
+}
+
 const realFetch = window.fetch.bind(window);
 window.fetch = async (input, init) => {
   const path = String(input);
+  if (/\/billing(\/(checkout|portal))?$/u.test(path)) {
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    if (init?.method !== "POST")
+      return Response.json({ ok: true, value: billingView() });
+    // The stand-in opens no Stripe page: it answers as a Stripe fault does.
+    return Response.json(
+      { ok: false, error: "billing_provider_unavailable" },
+      { status: 503 },
+    );
+  }
   const paidUse = path.endsWith("/jev-features/paid-use");
   if (!paidUse && !path.endsWith("/jev-features"))
     return realFetch(input, init);
@@ -197,6 +245,7 @@ createRoot(root).render(
               <BillingRoute
                 organisationId="organisation_jev_preview"
                 isOwner={owner}
+                canRead={admin}
                 jevHref="/jev"
               />
             </Page>

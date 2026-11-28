@@ -99,6 +99,12 @@ type CurrentSourceFlowLabelInput =
       authority: RequestAuthority;
     }>
   | Readonly<{
+      /** The billing state of Settings › Billing, which the owner and an admin may read. */
+      kind: "billing_account";
+      db: OrganisationDatabase;
+      authority: RequestAuthority;
+    }>
+  | Readonly<{
       kind: "native_chat";
       db: OrganisationDatabase;
       authority: Variant<RequestAuthority, "control">;
@@ -152,6 +158,8 @@ export async function createCurrentSourceFlowLabel(
     case "bake_board":
     case "jev_settings":
       return createSavedBakeryRunLabel(input);
+    case "billing_account":
+      return createOrganisationRecordLabel(input, organisationAdminPolicy);
     case "ingress":
       return createCurrentIngressFlowLabel(input);
     case "integration_resource":
@@ -922,16 +930,27 @@ function nativeChatPolicy(
   };
 }
 
+type OrganisationRecordInput = Variant<
+  CurrentSourceFlowLabelInput,
+  | "saved_bakery_run"
+  | "device_fleet"
+  | "recipe_workflow"
+  | "bake_board"
+  | "jev_settings"
+  | "billing_account"
+>;
+
 /** Saved bakery runs are readable by every active member of their organisation. */
-async function createSavedBakeryRunLabel(
-  input: Variant<
-    CurrentSourceFlowLabelInput,
-    | "saved_bakery_run"
-    | "device_fleet"
-    | "recipe_workflow"
-    | "bake_board"
-    | "jev_settings"
-  >,
+function createSavedBakeryRunLabel(
+  input: OrganisationRecordInput,
+): Promise<Result<FlowLabel, CurrentSourceFlowLabelError>> {
+  return createOrganisationRecordLabel(input, organisationWorkspacePolicy);
+}
+
+/** The label of an Organisation record, with the readers that `policyOf` gives. */
+async function createOrganisationRecordLabel(
+  input: OrganisationRecordInput,
+  policyOf: (policy: FlowPolicyInput) => FlowPolicyInput,
 ): Promise<Result<FlowLabel, CurrentSourceFlowLabelError>> {
   if (
     input.authority.kind !== "control" &&
@@ -941,7 +960,7 @@ async function createSavedBakeryRunLabel(
     return sourceSubjectInactive(input.authority.kind);
   const base = await createCurrentIngressFlowLabel(input);
   if (!base.ok) return base;
-  return createFlowLabel(base.value.policies.map(organisationWorkspacePolicy));
+  return createFlowLabel(base.value.policies.map(policyOf));
 }
 function organisationWorkspacePolicy(policy: FlowPolicyInput): FlowPolicyInput {
   return {
@@ -951,6 +970,16 @@ function organisationWorkspacePolicy(policy: FlowPolicyInput): FlowPolicyInput {
       { kind: "organisation_role", role: "admin" },
       { kind: "organisation_role", role: "operator" },
       { kind: "organisation_role", role: "viewer" },
+    ],
+  };
+}
+/** A record of the owner and the admins, such as the billing state. */
+function organisationAdminPolicy(policy: FlowPolicyInput): FlowPolicyInput {
+  return {
+    owner: policy.owner,
+    readers: [
+      { kind: "organisation_role", role: "owner" },
+      { kind: "organisation_role", role: "admin" },
     ],
   };
 }

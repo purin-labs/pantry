@@ -2,20 +2,19 @@
 // The types of each module that the actor hosts are in a file of that module:
 // commerce-types.ts, policy-types.ts, activation-types.ts and code-mode-types.ts.
 import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { OrganisationPlanId } from "../../plans";
 
 export type OrganisationPing = {
   ok: true;
   kind: "organisation";
 };
 
-type OrganisationPlan = "beta";
-
 export type OrganisationStatus = "active" | "suspended" | "deleted" | "purged";
 
 export type OrganisationMetaInput = {
   organisationId: OrganisationId;
   name: string;
-  plan: OrganisationPlan;
+  plan: OrganisationPlanId;
   status: OrganisationStatus;
   createdAt: number;
 };
@@ -62,7 +61,7 @@ export type OrganisationCutoverCueSettlementError = {
 export type OrganisationMetaRow = Record<string, SqlStorageValue> & {
   organisation_id: string;
   name: string;
-  plan: OrganisationPlan;
+  plan: OrganisationPlanId;
   status: OrganisationStatus;
   created_at: number;
 };

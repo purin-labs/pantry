@@ -89,6 +89,15 @@ export interface Env {
   STRIPE_CONNECT_CLIENT_SECRET?: string;
   STRIPE_CONNECT_WEBHOOK_ID?: string;
   STRIPE_CONNECT_WEBHOOK_SECRET?: string;
+  /**
+   * Pantry's own Stripe account, which bills the Organisations for paid Jev
+   * use (Plan 95 step 6). Without the two secrets and the price id, billing
+   * is closed and paid use stays off.
+   */
+  PANTRY_STRIPE_BILLING_SECRET_KEY?: string;
+  PANTRY_STRIPE_BILLING_WEBHOOK_SECRET?: string;
+  /** The metered Stripe price of Jev input tokens above the free use (a var). */
+  PANTRY_STRIPE_BILLING_PRICE_ID?: string;
   SHOPIFY_CLIENT_ID?: string;
   SHOPIFY_CLIENT_SECRET?: string;
   AIRTABLE_OAUTH_CLIENT_ID?: string;

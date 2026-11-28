@@ -496,6 +496,8 @@ const JEV_VIEW = {
     enabled: false,
     spendingLimitMinor: 0,
     spentMinor: 0,
+    limitReached: false,
+    highestSpendingLimitMinor: 1_000,
     priced: false,
   },
 };

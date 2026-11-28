@@ -20,10 +20,10 @@ import {
   parseStripeConnectAccountId,
   parseStripeCueEvent,
   resolveStripeWebhookSecrets,
-  verifyStripeWebhookSignature,
   type StripeWebhookSecretCandidate,
   type StripeWebhookError,
 } from "./connector";
+import { verifyStripeWebhookSignature } from "@purin-labs/area-commerce-contract/server/stripe-webhook-signature";
 import type { Result } from "@purin-labs/kernel/result";
 import { assertNever, isRecord } from "@purin-labs/std";
 import { revokeAccountRemovedAtProvider } from "@purin-labs/area-integrations-contract/server/provider-revocation";

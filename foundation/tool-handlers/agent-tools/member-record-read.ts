@@ -25,6 +25,7 @@ export async function readMemberRecord<Value>(
       | "recipe_workflow"
       | "jev_settings"
       | "bake_board"
+      | "billing_account"
       | "ingress";
     recordId: string;
     /**

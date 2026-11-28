@@ -35,6 +35,8 @@ export type GatewayAdminRoute =
 export type GatewayWebhookRoute =
   | Readonly<{ kind: "stripeConnectWebhook" }>
   | Readonly<{ kind: "stripeWebhook"; organisationIdRaw: string }>
+  /** The webhook of Pantry's own Stripe account (Plan 95 step 6). */
+  | Readonly<{ kind: "stripeBillingWebhook" }>
   | Readonly<{ kind: "emailGoogleWebhook" }>
   | Readonly<{ kind: "whatsappWebhook" }>
   | Readonly<{ kind: "shopifyWebhook"; organisationIdRaw: string }>

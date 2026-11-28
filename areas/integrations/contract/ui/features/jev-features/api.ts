@@ -67,7 +67,13 @@ export async function changeJevPaidUse(
       isRecord(error.details) &&
       error.details.error === "jev_paid_use_invalid"
     )
-      throw new Error("Enter a spending limit from $0.01 to $1,000.00.");
+      throw new Error("Enter a spending limit that your plan allows.");
+    if (
+      error instanceof ControlApiError &&
+      isRecord(error.details) &&
+      error.details.error === "jev_payment_setup_required"
+    )
+      throw new Error("Set up payment in Settings › Billing first.");
     throw error;
   }
 }

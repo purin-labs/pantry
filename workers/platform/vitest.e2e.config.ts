@@ -32,6 +32,9 @@ const TEST_SECRET_BINDINGS = {
   STRIPE_CONNECT_CLIENT_SECRET: "sk_test_pantry_platform_e2e",
   STRIPE_CONNECT_WEBHOOK_ID: "we_e2e",
   STRIPE_CONNECT_WEBHOOK_SECRET: "whsec_e2e",
+  // Pantry's own Stripe account (Plan 95 step 6): test-mode values.
+  PANTRY_STRIPE_BILLING_SECRET_KEY: "sk_test_pantry_billing_e2e",
+  PANTRY_STRIPE_BILLING_WEBHOOK_SECRET: "whsec_pantrybillinge2e",
   ORGANISATION_ADMIN_TOKEN: "organisation-admin-e2e-token-000000000000",
   COMMERCE_SERVICE_TOKEN: "commerce-e2e-token",
   PANTRY_FAULT_INJECTION_TOKEN: "fault-injection-e2e-token-0000000000000",
@@ -46,6 +49,7 @@ const TEST_VALUE_BINDINGS = {
   NOTION_OAUTH_CLIENT_ID: "notion-e2e-client",
   PANTRY_DEPLOYMENT_PROFILE: "local",
   PANTRY_PUBLIC_ORIGIN: "https://localhost",
+  PANTRY_STRIPE_BILLING_PRICE_ID: "price_pantryjeve2e",
   PANTRY_TEST_ORGANISATION_OWNERS: "Test-Owner@pantry.test, second@pantry.test",
   SQUARE_OAUTH_CLIENT_ID: "sandbox-sq0idb-e2e",
   SQUARE_OAUTH_ENVIRONMENT: "development",

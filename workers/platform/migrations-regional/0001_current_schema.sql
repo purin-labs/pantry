@@ -4442,6 +4442,17 @@ WHEN OLD.state <> 'pending' OR NEW.organisation_id <> OLD.organisation_id
   OR NEW.expires_at <> OLD.expires_at
 BEGIN SELECT RAISE(ABORT, 'organisation_invitation_closed'); END;
 
+CREATE TABLE organisation_billing_account (
+  organisation_id TEXT PRIMARY KEY REFERENCES organisation(organisation_id),
+  stripe_customer_id TEXT NOT NULL CHECK (stripe_customer_id LIKE 'cus_%'),
+  stripe_subscription_id TEXT CHECK (stripe_subscription_id IS NULL OR stripe_subscription_id LIKE 'sub_%'),
+  payment_state TEXT NOT NULL CHECK (payment_state IN ('none', 'active', 'past_due', 'canceled')),
+  last_stripe_event_created INTEGER NOT NULL DEFAULT 0 CHECK (last_stripe_event_created >= 0),
+  updated_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX organisation_billing_account_customer
+  ON organisation_billing_account (stripe_customer_id);
+
 CREATE TABLE device_gateway (
   gateway_id TEXT PRIMARY KEY,
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),

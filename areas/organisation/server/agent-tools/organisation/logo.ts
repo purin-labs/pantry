@@ -1,34 +1,11 @@
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import {
-  defineToolFamily,
-  jsonSchema,
-} from "@purin-labs/agent-tools/define-tool";
-import { ToolRequestError } from "@purin-labs/agent-tools/errors";
-import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-
-/** The logo change that the agent asks for. */
-export type LogoChangeRequest = Readonly<{
-  subject: "organisation" | "workspace";
-  /** Null for the organisation itself. */
-  workspaceId: string | null;
-  /** The one image of the current message, or no logo. */
-  logo: "attached_image" | "remove";
-}>;
-
-/** A logo change that was refused, in words that the agent can act on. */
-export class LogoRequestError extends ToolRequestError {}
-
-/** What a turn gives to the organisation tools. */
-export type OrganisationToolServices = {
-  readonly changeLogo: (
-    request: LogoChangeRequest,
-    operationId: string,
-  ) => Promise<PreparedEffect>;
-};
-
-const defineOrganisationTool =
-  defineToolFamily<OrganisationToolServices>()("organisation");
+import {
+  defineOrganisationTool,
+  LogoRequestError,
+  type LogoChangeRequest,
+} from "./services";
 
 /**
  * The owner's ··· › Change logo of the Organisations page, for the Portal

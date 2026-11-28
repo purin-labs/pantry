@@ -74,6 +74,9 @@ function coversExecutableDefinitions(): void {
     ...CUSTOM_CONNECTOR_CAPABILITY_IDS,
     // The voice routes check this one; no agent tool runs it.
     CAPABILITY_KEYS.voiceTranscription,
+    // Payment setup and the spending limit are for the owner, on the page.
+    // No agent tool runs it (Plan 95, "Agent access").
+    CAPABILITY_KEYS.billingAccountManage,
   ]);
   for (const capabilityId of COMMERCE_NATIVE_CAPABILITIES) {
     expect(catalogueIds.has(capabilityId)).toBe(true);

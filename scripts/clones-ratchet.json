@@ -1,5 +1,5 @@
 {
-  "total": {"copies":728,"lines":12679},
+  "total": {"copies":726,"lines":12648},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -138,7 +138,6 @@
     "areas/integrations/shopify/webhooks.ts = areas/integrations/shopify/webhooks.ts": {"copies":1,"lines":17},
     "areas/integrations/ui/features/integrations/page-actions.ts = areas/integrations/ui/features/integrations/page-actions.ts": {"copies":2,"lines":27},
     "areas/integrations/ui/features/integrations/settings-routes.tsx = areas/integrations/ui/features/integrations/settings-routes.tsx": {"copies":1,"lines":17},
-    "areas/integrations/ui/features/jev-features/route.tsx = areas/organisation/ui/features/billing/route.tsx": {"copies":2,"lines":31},
     "areas/kitchen/server/actors/bakery-surface-effect.ts = areas/kitchen/server/actors/bakery-surface-effect.ts": {"copies":1,"lines":16},
     "areas/kitchen/server/actors/costs-sheet-draft.ts = areas/kitchen/server/actors/production-plan.ts": {"copies":1,"lines":18},
     "areas/kitchen/server/actors/costs-sheet-draft.ts = areas/kitchen/server/actors/workflow-draft.ts": {"copies":1,"lines":13},

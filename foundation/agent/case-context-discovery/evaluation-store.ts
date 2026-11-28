@@ -88,6 +88,8 @@ export type CaseContextCollectionStoreError = Readonly<{
     | "case_context_collection_inactive"
     | "case_context_discovery_budget_exhausted"
     | "case_context_discovery_allowance_reached"
+    | "case_context_discovery_spending_limit_reached"
+    | "case_context_discovery_paid_use_unfunded"
     | "case_context_discovery_rate_limited"
     | "case_context_collection_store_invalid";
 }>;
@@ -429,6 +431,10 @@ function caseContextCollectionStoreResult<Value>(
       return failure("case_context_discovery_budget_exhausted");
     case "allowance_reached":
       return failure("case_context_discovery_allowance_reached");
+    case "spending_limit_reached":
+      return failure("case_context_discovery_spending_limit_reached");
+    case "paid_use_unfunded":
+      return failure("case_context_discovery_paid_use_unfunded");
     case "rate_limited":
       return failure("case_context_discovery_rate_limited");
     case "store_invalid":

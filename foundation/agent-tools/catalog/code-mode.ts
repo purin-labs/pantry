@@ -318,6 +318,7 @@ function capabilityFromResourceScope(
     case CAPABILITY_KEYS.deviceCameraRead:
     case CAPABILITY_KEYS.jevFeaturesRead:
     case CAPABILITY_KEYS.jevFeaturesManage:
+    case CAPABILITY_KEYS.billingAccountRead:
     case CAPABILITY_KEYS.organisationLogoChange:
     case CAPABILITY_KEYS.bakeRead:
     case CAPABILITY_KEYS.bakePropose:

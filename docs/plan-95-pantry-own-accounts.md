@@ -2,7 +2,9 @@
 
 Status: steps 1 to 5 done, 22 November 2026. The owner decided the five
 decisions on 20 November 2026 (see "Decisions"). Steps 1 to 5 are done and in
-production (see their "results" sections). Step 6 is open.
+production (see their "results" sections). Step 6 is built on the branch
+`plan-95` (28 November 2026) and not released. Billing stays closed until the
+owner makes the Purin Stripe account; journey J7 waits for it.
 
 - The owner decided on 20 November 2026: the Seams Wallet and its Console are
   one product, apart from Purin. Pantry and the Wallet stop sharing
@@ -238,8 +240,7 @@ This table replaces the first rows of "Authority and ownership" in
   them by design. Only a person whose verified Google email is on the Worker
   secret `PANTRY_TEST_ORGANISATION_OWNERS` may make one; every other person
   gets `organisation_test_not_allowed` (403). The list is a secret because
-  the repository is public. A test organisation counts toward the limit of
-  5. The Portal has no control for it: an owner on the list sends the
+  the repository is public. A test organisation counts toward the limit of 5. The Portal has no control for it: an owner on the list sends the
   request from a signed-in Portal session. Journey: the second case of
   `tests/e2e/organisation-setup.test.ts`.
 
@@ -726,10 +727,12 @@ above:
 - The session "Console Pantry service removal" (Refactor 260) knows that
   Pantry binds no Console.
 
-### 6. Stripe billing — open
+### 6. Stripe billing — built, closed until the Stripe account exists
 
-Open on 28 November 2026. It waits for the Purin Stripe account of decision 3,
-which the owner makes. Its test-mode keys are enough to start.
+Built on 28 November 2026, on the branch `plan-95`. Journey J6 passes. Journey
+J7 and the switch to live keys wait for the Purin Stripe account of
+decision 3, which the owner makes. No deployment has the Stripe values, so
+paid use is closed everywhere (`priced: false`), as before.
 
 - The plan catalog, `organisation_billing_account`, Checkout, the Customer
   Portal, meter events, the webhook, local admission, the Billing page, the
@@ -752,6 +755,124 @@ which the owner makes. Its test-mode keys are enough to start.
 - Production: paid use stays off (`priced: false`) until the live Purin
   Stripe account exists (decision 3). The switch to live keys is one
   secret change and one live J7 run.
+
+#### Step 6 results
+
+What is built, and where the work differs from the design:
+
+- **Plan catalog.** `foundation/tenancy/plans.ts` has the `beta` plan: $1.00
+  of free Jev use, a default spending limit of $5 and a highest limit of $10.
+  The ledger and the paid-use limit read it. The Actor reads its plan from
+  its Organisation record.
+- **Billing account.** `organisation_billing_account` (regional) belongs to
+  the Organisation area (`areas/organisation/server/billing/`), not to
+  tenancy: the layer rules give the word "billing" to that area. Pantry makes
+  the row and the Stripe customer when the owner starts payment setup, with
+  the payment state `none`.
+- **Stripe client.** `areas/organisation/contract/server/billing/stripe-client.ts`
+  calls Stripe with `PANTRY_STRIPE_BILLING_SECRET_KEY`: the customer, Checkout
+  in subscription mode with the price of `PANTRY_STRIPE_BILLING_PRICE_ID`, the
+  Customer Portal and the meter event `pantry_jev_input_tokens`. Billing is
+  closed without the two secrets and the price id. In production it is also
+  closed with a test-mode key, so that no Organisation gets paid use for a
+  test card.
+- **Routes.** `GET …/billing` (owner and admin), `POST …/billing/checkout`
+  and `POST …/billing/portal` (owner). Stripe returns the owner to the Portal
+  address that the page sends, which must be under `/portal/`.
+- **Webhook.** `POST /webhooks/stripe-billing`, with
+  `PANTRY_STRIPE_BILLING_WEBHOOK_SECRET`. The path is new, so `/webhooks/*`
+  is in `run_worker_first` of `wrangler.jsonc`. The event names no
+  Organisation that Pantry trusts: Pantry finds the account by the Stripe
+  customer in each regional database. It ignores an event that is older than
+  the last change. The check of a Stripe signature is one function for this
+  webhook and the two webhooks of Commerce
+  (`areas/commerce/contract/server/stripe-webhook-signature.ts`).
+- **Admission.** The Actor keeps a copy of the payment state and the Stripe
+  customer (`jev_payment_account`). The webhook writes it before the D1 row,
+  and only on a change. A call above the free use runs when paid use is on,
+  the payment state is `active`, and the month's charge with the call's
+  reservation plus the 5-cent hold is inside the limit. So paid use stops
+  5 cents before the limit. The hold row in `jev_paid_hold` marks the
+  feature-hour as a paid hour. The refusals are `allowance_reached`,
+  `paid_use_unfunded` and `spending_limit_reached`. The ledger of the
+  foundation asks through the port `typeSafePaidUse`.
+- **Paid use switch.** The owner turns paid use on only with the payment
+  state `active` (`jev_payment_setup_required`). A limit above the highest
+  limit of the plan is refused. `canceled` stops paid use like `past_due`.
+- **Meter events.** The hourly record of a paid hour is `pending`. The alarm
+  step sends one event with the tokens of the record above the free use of
+  its month, and the record is then `recorded`. The identifier is `jev_` and
+  the SHA-256 of the Organisation, the feature and the hour. Stripe refuses
+  an event older than 35 days, so a record older than 34 days is `refused`.
+- **Billing page.** Settings › Billing shows the plan, the payment state, the
+  free and paid use of the month, the spending limit, and "Set up payment" or
+  "Manage payment" for the owner. A member who is not the owner or an admin
+  cannot read it.
+- **Capabilities.** `billing.account.read` and `billing.account.manage` are
+  in the catalogue. The routes check the role. `billing.account.manage` has
+  no tool, and an agent cannot ask for it.
+- **Agent.** `billing_account_read` gives the view of the page to the owner
+  or an admin. Its value enters the turn under a label that only the owner
+  and the admins read. No tool changes billing.
+- **Idle cost.** No cron, no poll and no new alarm. An Organisation with no
+  paid use writes no row, makes no Stripe object and gets no event.
+  `idle-tenant-cost.test.ts` passes with its budget.
+
+What J6 proves (`workers/platform/tests/e2e/plan-95-stripe-billing.test.ts`):
+
+- Before payment setup, the Organisation has no billing row and no Stripe
+  object, and the owner cannot turn paid use on.
+- An admin reads the billing state, and cannot open Checkout or the payment
+  page (404, and no Stripe request).
+- The owner's first start makes one customer and one Checkout with the
+  metered price. A second start makes no second customer.
+- An event with a wrong signature changes nothing.
+- After `invoice.payment_failed`, a call inside the free use runs, and a call
+  above it answers `paid_use_unfunded` before any TypeSafe request. After
+  `invoice.paid`, the same call runs.
+- At the limit, the next mail call answers `spending_limit_reached`.
+- A replayed event and a late older event write no row in D1 or in an Actor.
+- The closed hour sends one meter event with 56,000 tokens, of the 120,000
+  mail tokens of the hour. A second send has the same identifier.
+- The agent reads the same view as the page, and the tool search finds no
+  tool that changes billing.
+
+The Plan 88 journey J7 (paid use closed) is deleted from
+`plan-88-jev-features.test.ts`: the E2E Worker now has the Stripe test
+values, and J6 covers the refusals of the owner and the admin. No journey
+runs a Worker without the Stripe values.
+
+Not done:
+
+- J7 did not run: no Purin Stripe account and no billing key exist.
+- An archive or a purge does not cancel the Stripe subscription.
+- Pantry computes the charge for the limit, and Stripe prices the invoice.
+  The two can differ by the rounding of one cent.
+
+Before a release:
+
+- Apply `workers/platform/scripts/plan-95-billing-account-d1-patch.sql` to
+  each regional database (`pantry-organisation-apac` in production).
+- Apply the SQL of `node scripts/capability-policy-backfill-sql.mjs` to each
+  regional database, for the two billing capabilities.
+- The release can go out with no Stripe value: billing stays closed.
+
+To open billing (the owner, then one J7 run):
+
+- In the Purin Stripe account, make a meter with the event name
+  `pantry_jev_input_tokens` (sum of `value`, the customer in
+  `stripe_customer_id`), and one metered price on it: $0.084 for each
+  1,000,000 units.
+- Make a webhook endpoint at `<public origin>/webhooks/stripe-billing` for
+  the five events of "Billing".
+- Save `PANTRY_STRIPE_BILLING_SECRET_KEY` and
+  `PANTRY_STRIPE_BILLING_WEBHOOK_SECRET` in `.env.local.production`, and set
+  each one on the Worker: `pnpm --filter @purin-labs/platform exec wrangler
+secret put <name> --env production`.
+- Put the var `PANTRY_STRIPE_BILLING_PRICE_ID` in the production `vars` of
+  `workers/platform/wrangler.jsonc`, and release.
+- For J7 in test mode, use a deployment that is not production: production
+  keeps billing closed with a test-mode key.
 
 ## Order with Plan 93 and Refactor 200
 
@@ -839,7 +960,8 @@ recommendations?". The owner answered "Take all five".
 - **Plan 88.** D12 (the Console grants a $10 credit limit at payment setup)
   becomes the highest spending limit of the plan catalog. D13 (prepaid or
   postpaid) becomes postpaid only (decision 2), so the prepaid credit packs
-  go. "Billing today" becomes history. Step 6 updates the plan.
+  go. "Billing today" becomes history. Plan 88 is closed and in the history
+  folder, so step 6 changed the spec ORG-02 instead.
 - **Plan 93.** The new stack has no `ACCOUNT_PLATFORM`. The step 3 check "a
   sign-up makes a new organisation through the Console" becomes "through
   Pantry". The `ACCOUNT_PLATFORM_*` values leave "Who uses the old
@@ -847,6 +969,7 @@ recommendations?". The owner answered "Take all five".
   becomes Refactor 260 work. Done: step 4 of this plan made these edits.
 - **Refactor 17.** Each new table needs a line in the `tables` map of
   `scripts/layers.json`. The dropped tables leave it. Done for steps 1 to 5:
-  `account_service_binding` is not in the map. Step 6 adds its tables.
+  `account_service_binding` is not in the map. Done for step 6:
+  `organisation_billing_account` belongs to `areas/organisation`.
 - **Plan 81.** The agent gets the billing read tool. The list of refused
   account actions is in "Agent access".

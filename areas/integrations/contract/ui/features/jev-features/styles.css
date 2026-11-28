@@ -165,10 +165,6 @@
   flex: 1 1 32ch;
 }
 
-.jev-prompt-link {
-  font-weight: 500;
-}
-
 .jev-paid-use {
   display: grid;
   gap: var(--pantry-space-2);

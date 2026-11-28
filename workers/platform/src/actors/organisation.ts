@@ -1,6 +1,9 @@
 import type { ScreenRelevanceCheckInput } from "@purin-labs/area-integrations/server/jev-features/screen-relevance-check";
 import { deleteOldScreenRelevanceRecords } from "@purin-labs/area-integrations/server/jev-features/screen-relevance";
-import { sealJevUsageHours } from "@purin-labs/area-integrations/server/jev-features/usage-records";
+import {
+  deliverJevUsageHours,
+  sealJevUsageHours,
+} from "@purin-labs/area-integrations/server/jev-features/usage-records";
 import {
   mailSwitchMoveDue,
   moveMailSwitch,
@@ -277,6 +280,7 @@ import {
   manageJevFeatureForOrganisation,
   manageJevPaidUseForOrganisation,
   readJevFeaturesForOrganisation,
+  syncJevPaymentAccountForOrganisation,
   type OrganisationJevHost,
   type OrganisationJevRpc,
 } from "@purin-labs/area-integrations/server/jev-features/organisation-settings";
@@ -974,6 +978,15 @@ export class OrganisationDO
     return this.command(
       input.organisationId,
       manageJevFeatureForOrganisation.bind(null, this.#jevHost(), input),
+    );
+  }
+
+  async syncJevPaymentAccount(
+    input: Parameters<OrganisationJevRpc["syncJevPaymentAccount"]>[0],
+  ) {
+    return this.command(
+      input.organisationId,
+      syncJevPaymentAccountForOrganisation.bind(null, this.#jevHost(), input),
     );
   }
 
@@ -2815,6 +2828,7 @@ export class OrganisationDO
       },
       {
         // Plan 88: each closed hour of Jev use on Pantry's key is sealed.
+        // Plan 95: a paid hour then goes to the Stripe meter.
         name: "jev_usage",
         run: async () => {
           this.ctx.storage.transactionSync(
@@ -2825,6 +2839,12 @@ export class OrganisationDO
               now,
             ),
           );
+          await deliverJevUsageHours({
+            sql: this.ctx.storage.sql,
+            env: this.env,
+            organisationId: organisationId.value,
+            now,
+          });
         },
       },
       {

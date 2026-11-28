@@ -21,6 +21,10 @@ import {
   matchUserPreferencesRoute,
 } from "@purin-labs/area-organisation/server/control/routes/user-preferences";
 import {
+  handleBillingRoute,
+  matchBillingRoute,
+} from "@purin-labs/area-organisation/server/control/routes/billing";
+import {
   handleMailAssistantRoute,
   matchMailAssistantRoute,
 } from "@purin-labs/area-inbox/server/control/routes/mail-assistant";
@@ -287,6 +291,7 @@ const CONTROL_ROUTE_FAMILIES: readonly ControlRouteFamily[] = [
     handleTypeSafeConnectionRoute,
   ),
   controlRouteFamily(matchJevFeaturesRoute, handleJevFeaturesRoute),
+  controlRouteFamily(matchBillingRoute, handleBillingRoute),
   controlRouteFamily(matchCaseContextDiscoveryRoute, (request, env, route) =>
     handleCaseContextDiscoveryRoute(request, env, route, {
       verifySelection: resolveCaseContextCollectionSelectionVerification,

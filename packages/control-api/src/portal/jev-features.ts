@@ -57,9 +57,13 @@ type JevPaidUse = Readonly<{
   spendingLimitMinor: number;
   /** The charge of the month so far, in US cents. */
   spentMinor: number;
+  /** Paid use is on and at its limit: Jev stops until the next month. */
+  limitReached: boolean;
+  /** The highest monthly limit of the Organisation's plan, in US cents. */
+  highestSpendingLimitMinor: number;
   /**
-   * Whether paid use is open. False until Pantry bills through Stripe (Plan 95
-   * step 6), so a person cannot turn paid use on.
+   * Whether paid use is open: this deployment bills through Stripe (Plan 95
+   * step 6). When false, a person cannot turn paid use on.
    */
   priced: boolean;
 }>;
@@ -180,6 +184,8 @@ function parseJevPaidUse(raw: unknown): JevPaidUse {
     typeof raw.enabled !== "boolean" ||
     !nonNegativeInteger(raw.spendingLimitMinor) ||
     !nonNegativeInteger(raw.spentMinor) ||
+    typeof raw.limitReached !== "boolean" ||
+    !nonNegativeInteger(raw.highestSpendingLimitMinor) ||
     typeof raw.priced !== "boolean"
   )
     throw new Error("Jev settings are unavailable.");
@@ -187,6 +193,8 @@ function parseJevPaidUse(raw: unknown): JevPaidUse {
     enabled: raw.enabled,
     spendingLimitMinor: raw.spendingLimitMinor,
     spentMinor: raw.spentMinor,
+    limitReached: raw.limitReached,
+    highestSpendingLimitMinor: raw.highestSpendingLimitMinor,
     priced: raw.priced,
   };
 }

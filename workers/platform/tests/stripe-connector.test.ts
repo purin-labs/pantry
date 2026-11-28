@@ -10,8 +10,8 @@ import {
   parseStripeConnectAccountId,
   parseStripeCueEvent,
   registerStripeWebhook,
-  verifyStripeWebhookSignature,
 } from "@purin-labs/area-commerce/server/stripe/connector";
+import { verifyStripeWebhookSignature } from "@purin-labs/area-commerce-contract/server/stripe-webhook-signature";
 
 type CapturedStripeRequest = {
   url: string;

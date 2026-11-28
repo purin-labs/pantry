@@ -2,6 +2,8 @@
 // entry module loads (Refactor 17). A port reads its implementation at the
 // call, so each part names its function when it runs.
 import { listVerifiedContactEndpoints } from "@purin-labs/area-inbox/server/data/contact-verification";
+import { admitJevPaidUse } from "@purin-labs/area-integrations/server/jev-features/paid-use";
+import { typeSafePaidUse } from "@purin-labs/agent/typesafe/evaluation-ledger";
 import { provideOrganisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 import { ORGANISATION_LIFECYCLE_PARTS } from "./organisation-lifecycle-parts";
 import {
@@ -610,3 +612,6 @@ placementMoveConditions.register({
 externalRecordsDiscovery.register({
   discoverAirtableBases: (...input) => discoverAirtableBases(...input),
 });
+// Paid Jev use above the free use (Plan 95 step 6): the ledger of the
+// foundation asks the Jev features of the integrations area.
+typeSafePaidUse.register(admitJevPaidUse);

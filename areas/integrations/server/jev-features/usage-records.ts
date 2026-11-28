@@ -1,29 +1,58 @@
-import { canonicalJson } from "@purin-labs/std";
+import { backoffDelay, canonicalJson, sha256Hex } from "@purin-labs/std";
+import {
+  sendStripeJevMeterEvent,
+  stripeBillingConfig,
+  type StripeBillingBindings,
+} from "@purin-labs/area-organisation-contract/server/billing/stripe-client";
 import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
+import {
+  JEV_FEATURE_OF_PURPOSE,
+  JEV_PRICE,
+  readJevPaidHold,
+  readJevPaymentAccount,
+  type JevPaidFeature,
+} from "./paid-use";
+import {
+  typeSafeMonth,
+  type TypeSafePurpose,
+} from "@purin-labs/agent/typesafe/usage-store";
 
 /**
  * Plan 88 section 3: each closed UTC hour of Jev use on Pantry's key becomes one
  * record for each feature. The Organisation Actor seals the hour from the
  * TypeSafe ledger. The record is the Organisation's own record of use.
  *
- * Plan 95 step 3: Pantry no longer sends the hours to the Console meter. A
- * sealed hour is `not_billed`. Pantry's own billing (Plan 95 step 6) sends the
- * paid hours to Stripe.
+ * Plan 95 step 6: a paid hour (a feature-hour with a paid hold) with tokens
+ * above the free use of its month is `pending`. The Actor sends one Stripe
+ * meter event for it, with those tokens only, and the record is then
+ * `recorded`. The identifier of the event is fixed for each feature and
+ * hour, so a repeated send charges nothing more. Every other hour is
+ * `not_billed`.
  */
 const HOUR_MS = 60 * 60 * 1_000;
 /** A call settles within its 10 s timeout; an hour closes 5 minutes after it ends. */
 const SEAL_GRACE_MS = 5 * 60 * 1_000;
 
-type JevFeature = "mail_classification" | "related_cases" | "screen_relevance";
+/** Stripe takes a meter event of the last 35 days; an older hour is refused. */
+const METER_EVENT_MAX_AGE_MS = 34 * 24 * HOUR_MS;
+const MAX_RETRY_MS = HOUR_MS;
 
-const FEATURE_OF_PURPOSE: Readonly<Record<string, JevFeature>> = {
-  mail_classification: "mail_classification",
-  case_context_discovery_relationship: "related_cases",
-  screen_relevance: "screen_relevance",
-};
+type SealedGroup = Readonly<{
+  purpose: string;
+  hour_start: number;
+  input_tokens: number;
+  evaluations: number;
+  evaluation_ids: string;
+}>;
+
+function featureOfPurpose(purpose: string): JevPaidFeature | undefined {
+  return Object.hasOwn(JEV_FEATURE_OF_PURPOSE, purpose)
+    ? JEV_FEATURE_OF_PURPOSE[purpose as TypeSafePurpose]
+    : undefined;
+}
 
 /** Called inside the owning Actor's synchronous schema transaction. */
 export function createJevUsageRecordSchema(sql: SqlStorage): void {
@@ -59,13 +88,7 @@ export function sealJevUsageHours(
   const limit = Math.floor((now - SEAL_GRACE_MS) / HOUR_MS) * HOUR_MS;
   if (limit <= sealedBefore) return;
   const groups = sql
-    .exec<{
-      purpose: string;
-      hour_start: number;
-      input_tokens: number;
-      evaluations: number;
-      evaluation_ids: string;
-    }>(
+    .exec<SealedGroup>(
       `SELECT purpose, (reserved_at / ${HOUR_MS}) * ${HOUR_MS} AS hour_start,
         COALESCE(SUM(input_tokens), 0) AS input_tokens, COUNT(*) AS evaluations,
         GROUP_CONCAT(evaluation_id, ' ') AS evaluation_ids
@@ -79,12 +102,17 @@ export function sealJevUsageHours(
     )
     .toArray();
   for (const group of groups) {
-    const feature = FEATURE_OF_PURPOSE[group.purpose];
+    const feature = featureOfPurpose(group.purpose);
     if (feature === undefined) continue;
+    // A paid hour waits for its meter event. The tokens above the free use
+    // are counted at the delivery, when each record of the month is sealed.
+    const paid =
+      group.input_tokens > 0 &&
+      readJevPaidHold(sql, organisationId, feature, group.hour_start);
     sql.exec(
       `INSERT INTO jev_usage_hour
         (organisation_id, feature, hour_start, input_tokens, evaluations, source_digest, state, outcome, due_at)
-      VALUES (?, ?, ?, ?, ?, ?, 'not_billed', ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT (organisation_id, feature, hour_start) DO NOTHING`,
       organisationId,
       feature,
@@ -98,16 +126,15 @@ export function sealJevUsageHours(
         inputTokens: group.input_tokens,
         evaluations: group.evaluation_ids.split(" ").filter(Boolean).sort(),
       }),
-      group.input_tokens === 0 ? "no_measured_tokens" : "unpriced",
+      paid ? "pending" : "not_billed",
+      paid
+        ? null
+        : group.input_tokens === 0
+          ? "no_measured_tokens"
+          : "free_use",
       now,
     );
   }
-  // An hour that waited for the Console meter is a record of use only. The
-  // update finds no row after its first run, and then writes nothing.
-  sql.exec(
-    "UPDATE jev_usage_hour SET state = 'not_billed', outcome = 'unpriced' WHERE organisation_id = ? AND state = 'pending'",
-    organisationId,
-  );
   // Closed hours with no call need no cursor move: the next seal reads the
   // same empty hours again. So an idle Organisation writes nothing here.
   if (groups.length === 0) return;
@@ -134,11 +161,189 @@ export function jevUsageDueAt(sql: SqlStorage): number | null {
   return organisationId.ok ? nextJevUsageAt(sql, organisationId.value) : null;
 }
 
-/** When the alarm must run next to seal an hour of Jev use, or null. */
+type PendingHour = Readonly<{
+  feature: JevPaidFeature;
+  hour_start: number;
+  input_tokens: number;
+  attempts: number;
+}>;
+
+/**
+ * Sends the paid hours that are due to the Stripe meter of Pantry's own
+ * Stripe account: one event for each hour, with the tokens above the free
+ * use of the month. An hour inside the free use is `not_billed`.
+ */
+export async function deliverJevUsageHours(
+  input: Readonly<{
+    sql: SqlStorage;
+    env: StripeBillingBindings;
+    organisationId: OrganisationId;
+    now: number;
+    fetcher?: typeof fetch;
+  }>,
+): Promise<void> {
+  const { sql, organisationId } = input;
+  const due = sql
+    .exec<PendingHour>(
+      `SELECT feature, hour_start, input_tokens, attempts FROM jev_usage_hour
+      WHERE organisation_id = ? AND state = 'pending' AND due_at <= ?
+      ORDER BY hour_start, feature LIMIT 24`,
+      organisationId,
+      input.now,
+    )
+    .toArray();
+  if (due.length === 0) return;
+  const config = stripeBillingConfig(input.env);
+  const customerId = readJevPaymentAccount(
+    sql,
+    organisationId,
+  ).stripeCustomerId;
+  for (const hour of due) {
+    const paidTokens = paidTokensOfHour(sql, organisationId, hour);
+    if (paidTokens === 0) {
+      finish(sql, organisationId, hour, "not_billed", "inside_free_use");
+      continue;
+    }
+    if (input.now - hour.hour_start > METER_EVENT_MAX_AGE_MS) {
+      finish(sql, organisationId, hour, "refused", "meter_event_too_old");
+      continue;
+    }
+    if (config === null || customerId === null) {
+      retry(sql, organisationId, hour, input.now);
+      continue;
+    }
+    const sent = await sendStripeJevMeterEvent(
+      {
+        config,
+        ...(input.fetcher === undefined ? {} : { fetcher: input.fetcher }),
+      },
+      {
+        customerId,
+        value: paidTokens,
+        identifier: await jevUsageEventId(
+          organisationId,
+          hour.feature,
+          hour.hour_start,
+        ),
+        timestamp: Math.floor((hour.hour_start + HOUR_MS - 1) / 1_000),
+      },
+    );
+    if (sent.ok)
+      finish(sql, organisationId, hour, "recorded", `metered:${paidTokens}`);
+    else if (sent.error.code === "stripe_billing_refused")
+      finish(
+        sql,
+        organisationId,
+        hour,
+        "refused",
+        `stripe_refused:${sent.error.status}`,
+      );
+    else retry(sql, organisationId, hour, input.now);
+  }
+}
+
+/**
+ * The event id of the record of one feature-hour. It is the identifier of the
+ * Stripe meter event, so Stripe keeps one event for each record.
+ */
+async function jevUsageEventId(
+  organisationId: OrganisationId,
+  feature: JevPaidFeature,
+  hourStart: number,
+): Promise<string> {
+  return `jev_${await sha256Hex(
+    canonicalJson([
+      "pantry_jev",
+      organisationId,
+      feature,
+      new Date(hourStart).toISOString(),
+    ]),
+  )}`;
+}
+
+/**
+ * The tokens of one paid record above the free use of its UTC month. The
+ * records of a month count in the order of their hour. Inside one hour, the
+ * records with no paid hold count first, so that the free use goes to them
+ * and the paid records of the hour carry what is above it.
+ */
+function paidTokensOfHour(
+  sql: SqlStorage,
+  organisationId: OrganisationId,
+  hour: PendingHour,
+): number {
+  const month = typeSafeMonth(hour.hour_start);
+  const before =
+    sql
+      .exec<{ tokens: number }>(
+        `SELECT COALESCE(SUM(record.input_tokens), 0) AS tokens
+        FROM jev_usage_hour AS record
+        LEFT JOIN jev_paid_hold AS hold
+          ON hold.organisation_id = record.organisation_id
+          AND hold.feature = record.feature AND hold.hour_start = record.hour_start
+        WHERE record.organisation_id = ? AND record.hour_start >= ?
+          AND (record.hour_start < ?
+            OR (record.hour_start = ? AND (hold.feature IS NULL OR record.feature < ?)))`,
+        organisationId,
+        month.start,
+        hour.hour_start,
+        hour.hour_start,
+        hour.feature,
+      )
+      .toArray()[0]?.tokens ?? 0;
+  const above = (tokens: number) =>
+    Math.max(0, tokens - JEV_PRICE.includedUnits);
+  return above(before + hour.input_tokens) - above(before);
+}
+
+function finish(
+  sql: SqlStorage,
+  organisationId: OrganisationId,
+  hour: PendingHour,
+  state: "recorded" | "not_billed" | "refused",
+  outcome: string,
+): void {
+  sql.exec(
+    `UPDATE jev_usage_hour SET state = ?, outcome = ?, attempts = attempts + 1
+    WHERE organisation_id = ? AND feature = ? AND hour_start = ? AND state = 'pending'`,
+    state,
+    outcome,
+    organisationId,
+    hour.feature,
+    hour.hour_start,
+  );
+}
+
+function retry(
+  sql: SqlStorage,
+  organisationId: OrganisationId,
+  hour: PendingHour,
+  now: number,
+): void {
+  sql.exec(
+    `UPDATE jev_usage_hour SET attempts = attempts + 1, due_at = ?
+    WHERE organisation_id = ? AND feature = ? AND hour_start = ? AND state = 'pending'`,
+    now + backoffDelay(hour.attempts, 60_000, MAX_RETRY_MS),
+    organisationId,
+    hour.feature,
+    hour.hour_start,
+  );
+}
+
+/**
+ * When the alarm must run next for the Jev usage records: to seal a closed
+ * hour, or to send a paid hour that is due. Null when there is no such work.
+ */
 function nextJevUsageAt(
   sql: SqlStorage,
   organisationId: OrganisationId,
 ): number | null {
+  const pending = sql
+    .exec<{ at: number | null }>(
+      "SELECT MIN(due_at) AS at FROM jev_usage_hour WHERE organisation_id = ? AND state = 'pending'",
+      organisationId,
+    )
+    .toArray()[0]?.at;
   const unsealed = sql
     .exec<{ at: number | null }>(
       `SELECT MIN(reserved_at) AS at FROM typesafe_evaluation
@@ -147,9 +352,12 @@ function nextJevUsageAt(
       readCursor(sql, organisationId),
     )
     .toArray()[0]?.at;
-  return unsealed === null || unsealed === undefined
-    ? null
-    : (Math.floor(unsealed / HOUR_MS) + 1) * HOUR_MS + SEAL_GRACE_MS;
+  const sealAt =
+    unsealed === null || unsealed === undefined
+      ? null
+      : (Math.floor(unsealed / HOUR_MS) + 1) * HOUR_MS + SEAL_GRACE_MS;
+  if (pending === null || pending === undefined) return sealAt;
+  return sealAt === null ? pending : Math.min(pending, sealAt);
 }
 
 function readCursor(sql: SqlStorage, organisationId: OrganisationId): number {

@@ -297,6 +297,7 @@
     "organisation_harness_erasure_object": "areas/organisation",
     "organisation_harness_erasure_session": "areas/organisation",
     "organisation_inference_selection": "foundation/agent",
+    "organisation_billing_account": "areas/organisation",
     "organisation_invitation": "foundation/tenancy",
     "organisation_onboarding": "foundation/tenancy",
     "organisation_onboarding_selection": "areas/organisation",

@@ -429,25 +429,28 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/organisation
 
-- Folders: 10
+- Folders: 12
   - `areas/organisation/server/actors/organisation/`
   - `areas/organisation/server/agent-tools/organisation/`
+  - `areas/organisation/server/billing/`
   - `areas/organisation/server/contract/`
   - `areas/organisation/server/control/`
   - `areas/organisation/server/control/routes/`
   - `areas/organisation/server/data/`
+  - `areas/organisation/server/gateway/`
   - `areas/organisation/ui/features/access/`
   - `areas/organisation/ui/features/agent-schedules/`
   - `areas/organisation/ui/features/billing/`
   - `areas/organisation/ui/pages/`
 - Packages: `areas/organisation`
-- Tables (20): `control_support_role`, `onboarding_reconciliation_run`, `onboarding_support_access_audit`, `onboarding_support_reference`, `operator_configuration_draft`, `organisation_activation_attempt`, `organisation_activation_receipt`, `organisation_activation_step`, `organisation_communication_destination`, `organisation_first_operational_task`, `organisation_harness_erasure`, `organisation_harness_erasure_object`, `organisation_harness_erasure_session`, `organisation_onboarding_selection`, `organisation_readiness_assessment`, `organisation_setup_snapshot`, `organisation_slack_channel`, `provider_account_tombstone`, `provider_manifest`, `user_preferences`
+- Tables (21): `control_support_role`, `onboarding_reconciliation_run`, `onboarding_support_access_audit`, `onboarding_support_reference`, `operator_configuration_draft`, `organisation_activation_attempt`, `organisation_activation_receipt`, `organisation_activation_step`, `organisation_billing_account`, `organisation_communication_destination`, `organisation_first_operational_task`, `organisation_harness_erasure`, `organisation_harness_erasure_object`, `organisation_harness_erasure_session`, `organisation_onboarding_selection`, `organisation_readiness_assessment`, `organisation_setup_snapshot`, `organisation_slack_channel`, `provider_account_tombstone`, `provider_manifest`, `user_preferences`
 - Public files: `areas/organisation/server/contract/`, `areas/organisation/ui/pages/account-invitation-link.ts`
 
 ## areas/organisation/contract
 
-- Folders: 3
+- Folders: 4
   - `areas/organisation/contract/server/`
+  - `areas/organisation/contract/server/billing/`
   - `areas/organisation/contract/ui/features/access/`
   - `areas/organisation/contract/ui/pages/`
 - Packages: `areas/organisation/contract`

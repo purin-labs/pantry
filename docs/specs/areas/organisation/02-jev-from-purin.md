@@ -5,9 +5,11 @@ call it: mail classification, related Cases and the screen relevance suggestion.
 Organisation needs no TypeSafe account: Pantry calls Jev with the Purin key
 `TYPESAFE_API_KEY`. An Organisation can connect its own key instead. An admin turns each
 feature on or off on Settings › Jev. Each Organisation gets $1.00 of free TypeSafe cost
-on the Purin key in each UTC month. At that amount, Jev stops until the next month. Paid
-use above the free use is closed, because Pantry has no billing of its own yet. Sous
-Chef reads the settings and proposes a switch change on a card that an admin approves.
+on the Purin key in each UTC month. At that amount, Jev stops until the next month,
+unless the owner set up payment and turned on paid use. Pantry bills paid use through its
+own Stripe account: one meter event for each paid hour, for the tokens above the free
+use. Sous Chef reads the settings and the billing state, and proposes a switch change on
+a card that an admin approves.
 
 ## What it does
 
@@ -121,24 +123,57 @@ The byte and token limits of Related Cases alone stop it at 50 calls.
   minutes after the hour ends (`SEAL_GRACE_MS`). It writes one `jev_usage_hour` row for
   each feature, with the token total and the call count. Its `source_digest` column
   holds canonical JSON that names the calls of the hour. It is not a hash.
-- A sealed hour has the state `not_billed`. It is the Organisation's own record of use.
-  Pantry sends it to no meter. A repeated seal writes nothing
+- A sealed hour is the Organisation's own record of use. A repeated seal writes nothing
   (`ON CONFLICT DO NOTHING`, and the cursor `jev_usage_cursor`).
-- Jev asks for an alarm only while an unsealed call on the Purin key exists. The seal
-  step runs on each alarm of the Organisation Actor, also an alarm for other work. It
-  moves `jev_usage_cursor` only past closed hours that hold calls, so an hour with no
-  Jev use writes nothing.
+- A paid hour is a feature-hour with a row in `jev_paid_hold` and measured tokens. Its
+  record is `pending`. Every other record is `not_billed`, with the outcome `free_use` or
+  `no_measured_tokens`.
+- The alarm step sends each `pending` record that is due (`deliverJevUsageHours`): one
+  Stripe meter event (`pantry_jev_input_tokens`) with the tokens of the record above the
+  free use of its UTC month. The records of a month count in the order of their hour, and
+  inside one hour the records with no paid hold count first. The record is then
+  `recorded` (`metered:<tokens>`). A record with no token above the free use is
+  `not_billed` (`inside_free_use`).
+- The identifier of the event is `jev_` and the SHA-256 of the Organisation, the feature
+  and the hour (`jevUsageEventId`). It is also the idempotency key, so a repeated send
+  charges nothing more.
+- Stripe answers 429 or 5xx, or billing is closed: the record waits and tries again, from
+  1 minute up to 1 hour. Stripe refuses the event: the record is `refused`. A record
+  older than 34 days is `refused` (`meter_event_too_old`), so the retry has an end.
+- Jev asks for an alarm only while an unsealed call on the Purin key or a `pending`
+  record exists. The seal step runs on each alarm of the Organisation Actor, also an
+  alarm for other work. It moves `jev_usage_cursor` only past closed hours that hold
+  calls, so an hour with no Jev use writes nothing.
 
 ### Paid use
 
 - `jev_paid_use` keeps the paid-use switch and a monthly spending limit in cents. The
-  default limit is 500 ($5.00). The owner can set 1 to 100,000 cents.
-- `JEV_PAID_USE_OPEN` is `false`. A command that turns paid use on fails with
-  `jev_paid_use_closed`. The owner can still turn it off and change the limit.
-- The view field `paidUse.priced` is `false`. The Portal disables the switch and says:
-  "Paid Jev use is not open yet. It opens when Purin Pantry billing starts."
+  plan catalog (`foundation/tenancy/plans.ts`) gives the default limit of the `beta` plan,
+  500 ($5.00), and its highest limit, 1,000 ($10.00). A higher limit fails with
+  `jev_paid_use_invalid`.
+- Paid use is open when the Worker has the two Stripe billing secrets and the price id
+  (`stripeBillingConfig`). In production, a test-mode key keeps it closed. The view field
+  `paidUse.priced` says if it is open. When it is closed, a command that turns paid use
+  on fails with `jev_paid_use_closed`, and the Portal disables the switch and says: "Paid
+  Jev use is not open yet. It opens when Purin Pantry billing starts."
+- To turn paid use on, the payment state must be `active`. If not, the command fails
+  with `jev_payment_setup_required`, and the Portal says "Set up payment in Settings ›
+  Billing first." The owner can always turn paid use off and change the limit.
+- `jev_payment_account` is the Actor's copy of the payment state and the Stripe customer
+  of the billing account. The billing webhook writes it, only on a change
+  (`syncJevPaymentAccount`).
+- Admission (`admitJevPaidUse`, the port `typeSafePaidUse` of the ledger): a call that
+  the free use does not cover runs only when paid use is on, the payment state is
+  `active`, and the month's charge with the call's reservation plus the 5-cent hold is
+  inside the spending limit. The refusals are `allowance_reached` (paid use off),
+  `paid_use_unfunded` (the payment state is not `active`) and `spending_limit_reached`.
+  The admission reads only rows of the Actor and makes no outside call. It stores the
+  hold of the feature-hour in `jev_paid_hold`.
+- Mail classification waits until the next month after `allowance_reached` or
+  `spending_limit_reached`, and until the next day after `paid_use_unfunded`.
 - `paidUse.spentMinor` is the month's charge at 84 cents for each 10,000,000 input tokens
-  above 23,809,523 free tokens, rounded up one time.
+  above 23,809,523 free tokens, rounded up one time. `paidUse.limitReached` is true when
+  paid use is on and the charge plus the hold is at the limit.
 - The prompt: at 80 % of the free use, with paid use off, one line names the share and
   the reset date. If `allowance.reached` is true (above 99.7 %), the line says "all of"
   the free use. The owner gets "Turn on paid use", which scrolls to the Paid use section
@@ -148,12 +183,36 @@ The byte and token limits of Related Cases alone stop it at 50 calls.
 
 ### Settings › Billing
 
-Settings › Billing (`areas/organisation/ui/features/billing/route.tsx`) reads the same view.
-It shows label and value rows: the free use of the month against its limit, the date
-the free use starts again, paid use, the charge of the month and the spending limit, and
-the prompt. On the Organisation's own key, one row says that TypeSafe bills that key.
-Its "Turn on paid use" and its link "Change paid use in Jev" open Settings › Jev at
-`#jev-paid-use`. It keeps no copy of a balance.
+Settings › Billing (`areas/organisation/ui/features/billing/route.tsx`) reads the billing
+view (`GET …/billing`). Only the owner and an admin read it; another member reads "Only
+the owner or an admin can see billing."
+
+- Rows: the plan, the payment state, the free use of the month against its limit, the
+  date the free use starts again, paid use, the charge of the month and the spending
+  limit. On the Organisation's own key, one row says that TypeSafe bills that key.
+- The payment state is `none`, `active`, `past_due` or `canceled`. `past_due` and
+  `canceled` stop paid use, and free use continues.
+- The owner gets one button. "Set up payment" opens Stripe Checkout in subscription mode
+  with the one metered price. After payment is set up, "Manage payment" opens the Stripe
+  Customer Portal, for the card and the invoices. Stripe returns the owner to the page.
+  Pantry shows no card form and keeps no card data.
+- An admin reads "Only the owner can set up or manage payment." When billing is closed,
+  the page says that payment setup is not open yet.
+- The link "Change paid use in Jev" opens Settings › Jev at `#jev-paid-use`. The page
+  keeps no copy of a balance.
+
+The billing account (`areas/organisation/server/billing/`):
+
+- `organisation_billing_account` (regional D1) keeps the Stripe customer, the
+  subscription, the payment state and the time of the last Stripe event that changed the
+  row. Pantry makes the row and the Stripe customer only when the owner starts payment
+  setup. An Organisation with no paid use has no row and no Stripe object.
+- `POST /webhooks/stripe-billing` takes the events of Pantry's own Stripe account, with
+  its own signing secret: `checkout.session.completed`, `customer.subscription.updated`,
+  `customer.subscription.deleted`, `invoice.paid` and `invoice.payment_failed`. It finds
+  the account by the Stripe customer, compares the event with the row and writes only on
+  a change. An event older than the last change is ignored. The Actor copy is written
+  first and the row last, so a retry of Stripe after a fault runs in full.
 
 ### The setup step
 
@@ -183,7 +242,11 @@ The tools are in `areas/integrations/server/agent-tools/jev/`, the family `jev`.
   (`presentJevDraftCommand`). A card that turns a switch on always says that the use
   counts toward the Jev allowance, also for an Organisation on its own key. The receipt
   scope is `jev.<feature>.on` or `jev.<feature>.off`.
-- The agent has no tool for paid use, a credit purchase or the spending limit.
+- The agent has no tool for payment setup, paid use or the spending limit. It reads the
+  billing state with `billing_account_read` (the family `organisation`, the capability
+  `billing.account.read`): the view of Settings › Billing, for the owner or an admin
+  only. The value enters the turn under the source label `billing_account`, which only
+  the owner and the admins read.
 
 ## Contracts
 
@@ -199,15 +262,20 @@ The tools are in `areas/integrations/server/agent-tools/jev/`, the family `jev`.
     (`jev-features/screen-relevance.ts`). The daily pass of the Organisation deletes a
     record 90 days after its check.
   - `jev_usage_hour` and `jev_usage_cursor` (`jev-features/usage-records.ts`).
-  - `jev_paid_use` (`jev-features/paid-use.ts`).
+  - `jev_paid_use`, `jev_payment_account` and `jev_paid_hold`
+    (`jev-features/paid-use.ts`).
 - Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `mail_classification_eligibility`, with `funding` and `connection_revision`. The Purin
   key pins revision 0. The model is `jev-1.13.0`, the recipient `typesafe`, and the
   review ends 10 years after the switch (`SWITCH_REVIEW_MS`).
+  `organisation_billing_account` is the billing account; its patch script is
+  `workers/platform/scripts/plan-95-billing-account-d1-patch.sql`.
 - The ledger (`typesafe/evaluation-ledger.ts`): `reserveTypeSafeEvaluation`
   and `settleTypeSafeEvaluation`, `JEV_MONTHLY_ALLOWANCE_MICROUSD` (1,000,000) and
   `JEV_REQUESTS_PER_SECOND` (5). Errors: `revision_conflict`, `command_conflict`,
-  `inactive`, `budget_exhausted`, `allowance_reached`, `rate_limited`, `store_invalid`.
+  `inactive`, `budget_exhausted`, `allowance_reached`, `spending_limit_reached`,
+  `paid_use_unfunded`, `rate_limited`, `store_invalid`. The port `typeSafePaidUse` admits
+  a call above the free use; the Worker registers `admitJevPaidUse` (`worker-ports.ts`).
 - The transport (`typesafe/system-one-client.ts`) posts to
   `https://api.typesafe.ai/v1/systemone`. A request is at most 24,576 bytes and a response
   32,768 bytes. HTTP 401 and 403 give `jev_credential_rejected`, 402 gives
@@ -215,16 +283,23 @@ The tools are in `areas/integrations/server/agent-tools/jev/`, the family `jev`.
 - The sink `TypeSafeInferenceSink` (`policy/information-flow/types.ts`) names the
   purpose, the `funding` and the model of each call.
 - The domain functions (`jev-features/organisation-settings.ts`):
-  `readJevFeaturesForOrganisation`, `manageJevFeatureForOrganisation` and
-  `manageJevPaidUseForOrganisation`, called through `OrganisationJevRpc` on the
-  Organisation Actor.
+  `readJevFeaturesForOrganisation`, `manageJevFeatureForOrganisation`,
+  `manageJevPaidUseForOrganisation` and `syncJevPaymentAccountForOrganisation`, called
+  through `OrganisationJevRpc` on the Organisation Actor.
+- The billing functions (`areas/organisation/server/billing/`):
+  `startBillingPaymentSetup`, `openBillingPaymentPortal`, `applyStripeBillingEvent` and
+  `readBillingView`. The Stripe client of Pantry's own account is
+  `areas/organisation/contract/server/billing/stripe-client.ts`.
 - The contract (`packages/control-api/src/portal/jev-features.ts`): `JevFeaturesView`,
   `JevAllowance`, `JevPaidUse`, `JevFeatureCommand` and `JevPaidUseCommand`, with their
-  parsers.
+  parsers. `packages/control-api/src/portal/billing.ts` has `BillingView`.
 - The draft family `jev_feature` (`integrations/contract/jev-draft.ts`) in
   `data/operator-configuration-draft.ts`.
 - The Worker secret `TYPESAFE_API_KEY` is in `env.production.secrets.required` of
   `workers/platform/wrangler.jsonc` and in `foundation/kernel/env.ts`.
+- The Worker secrets `PANTRY_STRIPE_BILLING_SECRET_KEY` and
+  `PANTRY_STRIPE_BILLING_WEBHOOK_SECRET` and the var `PANTRY_STRIPE_BILLING_PRICE_ID` are
+  optional. Without them billing is closed. No deployment has them yet.
 - `workers/platform/scripts/plan-88-mail-eligibility-funding-d1-patch.sql` is a record
   of the old stack. The new databases loaded the baseline with the column.
 
@@ -236,6 +311,9 @@ The control routes (`workers/platform/src/control/routes/`):
 | `POST /v1/control/organisations/:id/jev-features`                 | Admin  | One `JevFeatureCommand`                                      |
 | `POST /v1/control/organisations/:id/jev-features/paid-use`        | Owner  | `{ enabled, spendingLimitMinor }`                            |
 | `GET`, `POST /v1/control/organisations/:id/integrations/typesafe` | Admin  | Read, connect, test or disconnect the Organisation's own key |
+| `GET /v1/control/organisations/:id/billing`                       | Admin  | The billing view                                             |
+| `POST /v1/control/organisations/:id/billing/checkout`             | Owner  | `{ returnPath }`; answers the Stripe Checkout address        |
+| `POST /v1/control/organisations/:id/billing/portal`               | Owner  | `{ returnPath }`; answers the Stripe Customer Portal address |
 
 A role below the route's role gets 404. On the jev-features routes, a body over 4,096
 bytes, a body that is not JSON and a body that is not an object give 400
@@ -245,21 +323,25 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
 
 ## Rules and limits
 
-| Action                                       | Viewer and operator | Admin | Owner                            | Agent                                  |
-| -------------------------------------------- | ------------------- | ----- | -------------------------------- | -------------------------------------- |
-| See the switches, the free use and paid use  | Yes                 | Yes   | Yes                              | `jev_features_read`                    |
-| Turn a switch on or off                      | No                  | Yes   | Yes                              | Proposal; the admin who asked approves |
-| Connect or remove the Organisation's own key | No                  | Yes   | Yes                              | No                                     |
-| Change paid use or the spending limit        | No                  | No    | Yes, but paid use cannot turn on | No                                     |
+| Action                                       | Viewer and operator | Admin | Owner                                              | Agent                                  |
+| -------------------------------------------- | ------------------- | ----- | -------------------------------------------------- | -------------------------------------- |
+| See the switches, the free use and paid use  | Yes                 | Yes   | Yes                                                | `jev_features_read`                    |
+| Turn a switch on or off                      | No                  | Yes   | Yes                                                | Proposal; the admin who asked approves |
+| Connect or remove the Organisation's own key | No                  | Yes   | Yes                                                | No                                     |
+| Change paid use or the spending limit        | No                  | No    | Yes; paid use turns on only with an active payment | No                                     |
+| Read the billing state                       | No                  | Yes   | Yes                                                | `billing_account_read`                 |
+| Set up or manage payment                     | No                  | No    | Yes                                                | No                                     |
 
-| Limit                     | Value                                  | Constant                           |
-| ------------------------- | -------------------------------------- | ---------------------------------- |
-| Free use on the Purin key | $1.00 each UTC month                   | `JEV_MONTHLY_ALLOWANCE_MICROUSD`   |
-| Fair share                | 5 calls a second for each Organisation | `JEV_REQUESTS_PER_SECOND`          |
-| Seal of an hour           | 5 minutes after the hour ends          | `SEAL_GRACE_MS`                    |
-| Default spending limit    | 500 cents                              | `JEV_DEFAULT_SPENDING_LIMIT_MINOR` |
-| Paid use                  | Closed                                 | `JEV_PAID_USE_OPEN`                |
-| Own-key probe             | 1 each 30 s                            | In `typesafe/connection.ts`        |
+| Limit                     | Value                                  | Constant                         |
+| ------------------------- | -------------------------------------- | -------------------------------- |
+| Free use on the Purin key | $1.00 each UTC month                   | `JEV_MONTHLY_ALLOWANCE_MICROUSD` |
+| Fair share                | 5 calls a second for each Organisation | `JEV_REQUESTS_PER_SECOND`        |
+| Seal of an hour           | 5 minutes after the hour ends          | `SEAL_GRACE_MS`                  |
+| Default spending limit    | 500 cents                              | The `beta` plan in `plans.ts`    |
+| Highest spending limit    | 1,000 cents                            | The `beta` plan in `plans.ts`    |
+| Hold of paid use          | 5 cents                                | `JEV_HOLD_MINOR`                 |
+| Paid use                  | Open with the Stripe billing values    | `stripeBillingConfig`            |
+| Own-key probe             | 1 each 30 s                            | In `typesafe/connection.ts`      |
 
 - **Information flow.** Each feature request passes `TypeSafeDisclosure` with its
   purpose and a source authority: `control` for mail classification and screen
@@ -273,10 +355,13 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
   operator's own question to Jev.
 - **Capabilities.** `jev.features.read` and `jev.features.manage` are in
   `authorization/capability-catalogue.ts` and in `requestable-capabilities.ts`, so an agent
-  can ask for each in the permission prompt. Each needs
-  `node scripts/capability-policy-backfill-sql.mjs`.
+  can ask for each in the permission prompt. `billing.account.read` is there too.
+  `billing.account.manage` is in the catalogue only: no tool uses it, and an agent cannot
+  ask for it. Each needs `node scripts/capability-policy-backfill-sql.mjs`.
 - **Idle cost.** A read of the view writes nothing. With no Jev use and no other alarm,
   Jev writes nothing. Another alarm can cause one cursor write for each closed hour.
+  Billing adds no cron and no poll. A webhook event that changes nothing writes nothing,
+  and an Organisation with no paid use has no billing row and gets no event.
 - **Neighbours.**
   - FND-09 owns the screen relevance suggestion, its check and its records. This spec
     owns only its switch and its allowance.
@@ -287,18 +372,22 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
   - FND-08 owns the Vault that keeps the Organisation's key. FND-06 owns roles and
     billing access. COM-05 describes the store `operator_configuration_draft`.
   - ORG-01 owns the setup dialog. [Plan 95](../../../plan-95-pantry-own-accounts.md) owns
-    Pantry's own billing, which paid use waits for.
+    Pantry's own billing, which this spec describes.
 - **Out of scope:** a new Jev feature, a model other than `jev-1.13.0`, and the price of
   the Pantry subscription.
 
 ## Open work
 
-- Paid use is closed until Pantry bills through its own Stripe account (Plan 95 step 6).
-  No hold, no admission above the free use and no meter delivery exist.
-  `spending_limit_reached` and `paid_use_unfunded` are not built.
-- Settings › Billing shows no subscription, payment model, credit, card or invoice. Its
-  line "Payment method, credit and invoices" says that Purin Pantry billing has not
-  started. The Paid use section on Settings › Jev says the same under "How you pay".
+- No deployment has the Stripe billing values, so paid use is closed everywhere. The
+  owner makes the Purin Stripe account, its meter and its price (Plan 95 step 6). No
+  journey ran on real Stripe (Plan 95 J7).
+- Pantry computes the month's charge itself for the spending limit, and Stripe prices the
+  invoice from the meter. The two can differ by the rounding of one cent.
+- An archive or a purge of an Organisation does not cancel its Stripe subscription.
+- A change of the Stripe customer in Stripe itself (a merge or a delete) has no handler.
+- Two events of one customer that arrive in the same instant can apply in the wrong
+  order, because an event that changes nothing stores no time. The next subscription
+  event of Stripe repairs the state.
 - Pantry has no Portal notification at 80 % or 100 % of the free use. No chat sentence
   tells a person that a Jev feature stopped.
 - No journey covers the ledger's fair share of 5 calls a second.
@@ -312,12 +401,14 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
 - [Plan 88](../../../history/plan-88-satyr-funded-jev.md). Where it differs from the code, this
   spec follows the code. Its evidence in the archive:
   [Phase 3 journey](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-88-phase-3-journey.md).
-  The change to paid use: [Plan 95](../../../plan-95-pantry-own-accounts.md) step 3.
+  The change to paid use: [Plan 95](../../../plan-95-pantry-own-accounts.md) steps 3 and 6.
   The boundary: [Plan 87](../../../history/plan-87-screen-context.md) section 3A.
 - E2E journeys in `workers/platform/tests/e2e/`: `plan-88-jev-features.test.ts` (J1,
-  J2, J3, J4, J6 and J7) and `plan-88-jev-agent.test.ts` (J5). Neighbour journeys:
+  J2, J3, J4 and J6), `plan-88-jev-agent.test.ts` (J5) and
+  `plan-95-stripe-billing.test.ts` (Plan 95 J6: paid use, the billing webhook, the meter
+  event and the agent read). Neighbour journeys:
   `chat-screen-relevance.test.ts`, `mail-inbox.test.ts` and
   `organisation-case-context-collection-placement.test.ts`.
 - The Portal preview `apps/portal/jev-features-preview.html` has the cases `pantry`,
-  `own`, `missing`, `viewer`, `near`, `used`, `used-viewer`, `paid` and `unpriced`, and
-  `?page=billing`.
+  `own`, `missing`, `viewer`, `near`, `used`, `used-viewer`, `paid`, `unpriced`,
+  `past-due` and `admin`, and `?page=billing`.

@@ -4,49 +4,26 @@
 // the switch records and refuses the requests that the journeys assert.
 import { env } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
-import { http, HttpResponse } from "msw";
 import { expect, it } from "vitest";
-import {
-  parseJevFeaturesView,
-  type JevFeaturesView,
-} from "@purin-labs/control-api/portal/jev-features";
-import { encodeBase64Url, isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { typeSafeMonth } from "@purin-labs/agent/typesafe/usage-store";
-import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
-import {
-  bootstrapOrganisation,
-  type IssuedControlSession,
-} from "@purin-labs/tenancy/data/control-plane";
-import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
-import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
-import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
-import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
-import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
-import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
-import { requireVaultHandle } from "../test-ids";
 import { commerceClient } from "./commerce-support";
-import { network } from "./network";
 import { fixtureDatabase } from "./organisation-database";
 import { addOrganisationMember } from "./organisation-fixture";
 import { controlFetch } from "./chat-journey-support";
 import { WriteMeter } from "./write-meter";
 import { runArmedAlarm } from "./durable-object-alarm-support";
+import {
+  change,
+  features,
+  installFakes,
+  PANTRY_KEY,
+  preview,
+  shop,
+} from "./jev-journey-support";
 
-const PANTRY_KEY = "typesafe-pantry-e2e-key-0000000000";
 const OWN_KEY = "typesafe-own-e2e-key-00000000000";
-const RULE = {
-  kind: "categorize",
-  ruleId: "rule_supplier",
-  category: "Suppliers",
-  instruction: "Emails from a supplier about deliveries",
-} as const;
-
-type Client = Awaited<ReturnType<typeof commerceClient>>;
-type TypeSafeCall = Readonly<{ key: string; purpose: "probe" | "mail" }>;
 
 it(
   "J1 and J2: an Organisation with no TypeSafe key sorts mail with Pantry's key, and a switch turned off stops its feature for admins only",
@@ -294,97 +271,6 @@ function readHours(
     }));
 }
 
-it(
-  "J7: paid use is closed until Pantry bills through Stripe: above the free use a call stops, and neither an admin nor the owner can turn paid use on",
-  paidUseClosedJourney,
-  120_000,
-);
-
-async function paidUseClosedJourney(): Promise<void> {
-  const calls = installFakes(Promise.resolve(), 10_000);
-  const { organisationId, owner, accountId } = await shop("p88-paid-use");
-  const admin = await commerceClient("p88-paid-use-admin");
-  await addOrganisationMember(organisationId, admin, "admin");
-  await change(organisationId, owner.session, {
-    feature: "mail_classification",
-    enabled: true,
-  });
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId,
-    now: Date.now(),
-  });
-  // Seed: earlier related Cases use of this month on Pantry's key, 50,000
-  // tokens above the free use.
-  await runInDurableObject(
-    organisation,
-    seedTokenUse.bind(null, organisationId, "earlier-paid", 23_859_523),
-  );
-
-  // The free use is used: the call stops before TypeSafe.
-  const stopped = await preview(organisationId, owner.session, accountId);
-  expect(await stopped.text()).toContain("allowance_reached");
-  expect(calls).toEqual([]);
-  const before = await features(organisationId, owner.session);
-  expect(before.allowance?.reached).toBe(true);
-  expect(before.paidUse).toMatchObject({ enabled: false, priced: false });
-
-  // Denied: an admin who is not the owner.
-  const refused = await controlFetch(
-    organisationId,
-    admin.session,
-    "jev-features/paid-use",
-    { enabled: true, spendingLimitMinor: 500 },
-  );
-  expect(refused.status).toBe(404);
-  // Denied: the owner too, while paid use is closed.
-  const closed = await controlFetch(
-    organisationId,
-    owner.session,
-    "jev-features/paid-use",
-    { enabled: true, spendingLimitMinor: 500 },
-  );
-  expect(closed.status).toBe(409);
-  expect(await closed.text()).toContain("jev_paid_use_closed");
-
-  // The next call stops too, and paid use stays off.
-  const still = await preview(organisationId, owner.session, accountId, ["m2"]);
-  expect(await still.text()).toContain("allowance_reached");
-  expect(calls).toEqual([]);
-  expect((await features(organisationId, owner.session)).paidUse.enabled).toBe(
-    false,
-  );
-}
-
-/** One settled Pantry-funded related Cases row with a token total, this month. */
-function seedTokenUse(
-  organisationId: OrganisationId,
-  evaluationId: string,
-  tokens: number,
-  _actor: unknown,
-  state: DurableObjectState,
-): void {
-  const at = Math.max(typeSafeMonth(Date.now()).start, Date.now() - 5_000);
-  state.storage.sql.exec(
-    `INSERT INTO typesafe_evaluation (
-      organisation_id, purpose, evaluation_id, request_digest, policy_revision, funding,
-      connection_revision, disclosure_decision_digest, input_bytes, reserved_input_tokens,
-      reserved_wall_ms, reserved_cost_microusd, estimated_cost_microusd, input_tokens,
-      output_tokens, reserved_at, expires_at, state, settlement_state, failure_code
-    ) VALUES (?, 'case_context_discovery_relationship', ?, ?, 1, 'pantry_platform', NULL, ?,
-      100, 100, 1000, ?, ?, ?, 0, ?, ?, 'evaluated', 'settled', NULL)`,
-    organisationId,
-    evaluationId,
-    "a".repeat(64),
-    "b".repeat(64),
-    Math.ceil(tokens * 0.042),
-    Math.ceil(tokens * 0.042),
-    tokens,
-    at,
-    at + 1_000,
-  );
-}
-
 async function noKeyJourney(): Promise<void> {
   const calls = installFakes();
   const { organisationId, owner, accountId } = await shop("p88-no-key");
@@ -432,10 +318,15 @@ async function noKeyJourney(): Promise<void> {
   expect((await features(organisationId, operator.session)).funding).toBe(
     "pantry_platform",
   );
-  const refused = await post(organisationId, operator.session, {
-    feature: "related_cases",
-    enabled: true,
-  });
+  const refused = await controlFetch(
+    organisationId,
+    operator.session,
+    "jev-features",
+    {
+      feature: "related_cases",
+      enabled: true,
+    },
+  );
   // The role check hides an admin route from a lower role.
   expect(refused.status).toBe(404);
   expect((await features(organisationId, owner.session)).relatedCases).toEqual({
@@ -508,7 +399,7 @@ async function noKeyJourney(): Promise<void> {
   expect(screenOn.screenRelevance.enabled).toBe(true);
   expect(
     (
-      await post(organisationId, operator.session, {
+      await controlFetch(organisationId, operator.session, "jev-features", {
         feature: "screen_relevance",
         enabled: false,
       })
@@ -667,283 +558,6 @@ async function aMinuteLater(
       Date.now() + 60_000,
     );
   await state.storage.setAlarm(Date.now() + HOUR_MS);
-}
-
-function installFakes(
-  held: Promise<void> = Promise.resolve(),
-  mailTokens = 50,
-): TypeSafeCall[] {
-  const calls: TypeSafeCall[] = [];
-  network.use(
-    http.post(
-      "https://api.typesafe.ai/v1/systemone",
-      typeSafe.bind(null, calls, held, mailTokens),
-    ),
-    http.get("https://gmail.googleapis.com/gmail/v1/users/me/*", gmail),
-  );
-  return calls;
-}
-
-async function typeSafe(
-  calls: TypeSafeCall[],
-  held: Promise<void>,
-  mailTokens: number,
-  {
-    request,
-  }: {
-    request: { headers: Headers; json: () => Promise<unknown> };
-  },
-): Promise<Response> {
-  const key = (request.headers.get("authorization") ?? "").replace(
-    /^Bearer /,
-    "",
-  );
-  const raw: unknown = await request.json();
-  if (!isRecord(raw) || !isRecord(raw.questions))
-    throw new Error("Invalid fake TypeSafe request");
-  if (raw.questions.in_transit !== undefined) {
-    calls.push({ key, purpose: "probe" });
-    return HttpResponse.json({
-      model: "jev-1.13.0",
-      answers: { in_transit: { type: "noul", noul: 1 } },
-      usage: { input_tokens: 10, output_tokens: 0 },
-    });
-  }
-  calls.push({ key, purpose: "mail" });
-  await held;
-  return HttpResponse.json({
-    model: "jev-1.13.0",
-    answers: { rule_0: { type: "choice", choice: "matched" } },
-    usage: { input_tokens: mailTokens, output_tokens: 2 },
-  });
-}
-
-function gmail({ request }: { request: { url: string } }): Response {
-  const url = new URL(request.url);
-  const match = /\/messages\/(m[1-3])$/.exec(url.pathname);
-  if (match === null) return new Response("missing", { status: 404 });
-  const id = match[1] ?? "m1";
-  return HttpResponse.json({
-    id,
-    threadId: `t${id.slice(1)}`,
-    internalDate: "1790726400000",
-    sizeEstimate: 200,
-    labelIds: ["INBOX", "UNREAD"],
-    payload: {
-      mimeType: "text/plain",
-      headers: [
-        { name: "From", value: "Supplier <supplier@example.test>" },
-        { name: "Subject", value: "Packaging delivery delayed" },
-      ],
-      body: {
-        data: encodeBase64Url(
-          new TextEncoder().encode("Packaging arrives Friday."),
-        ),
-      },
-    },
-  });
-}
-
-async function shop(name: string): Promise<{
-  organisationId: OrganisationId;
-  owner: Client;
-  accountId: string;
-}> {
-  const owner = await commerceClient(`${name}-owner`);
-  const now = Date.now();
-  const placement = parseInitialOrganisationPlacement({
-    kind: "affinity",
-    placementEpoch: 1,
-    placementCellId: "e2e",
-    locationHint: "wnam",
-  });
-  if (!placement.ok) throw new Error(placement.error.path);
-  const created = await bootstrapOrganisation({
-    env,
-    owner: owner.identity,
-    organisationName: "Jev settings",
-    environment: "development",
-    placement: placement.value,
-    now,
-    mutation: {
-      scope: {
-        userId: owner.identity.userId,
-        organisationScope: "organisation:create",
-        route: "/v1/control/organisations",
-        operation: "organisation.create",
-      },
-      boundary: {
-        kind: "unversioned",
-        idempotencyKey: crypto.randomUUID(),
-        requestHash: "plan-88-e2e",
-      },
-      identity: newControlMutationIdentity({
-        portalSubjectHash: "plan-88-e2e",
-        causationId: crypto.randomUUID(),
-        now,
-      }),
-    },
-  });
-  if (!created.ok) throw new Error(created.error.code);
-  const organisationId = created.value.organisationId;
-  await fixtureDatabase()
-    .prepare(
-      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_receipt_id = 'plan-88-e2e', activated_at = ?, updated_at = ? WHERE organisation_id = ?",
-    )
-    .bind(now, now, organisationId)
-    .run();
-  const policy = defaultDenyPolicy({ now });
-  policy.version = 1;
-  policy.authz.allowedTools = [
-    CAPABILITY_KEYS.emailMailboxRead,
-    CONTEXT_CASE_READ_CAPABILITY,
-  ];
-  await fixtureDatabase()
-    .prepare(
-      "INSERT INTO policy_snapshot (organisation_id, version, body, created_at, created_by) VALUES (?, 1, ?, ?, 'plan-88-e2e')",
-    )
-    .bind(organisationId, JSON.stringify(policy), now)
-    .run();
-  await env.POLICY_KV.put(
-    `policy:${organisationId}:latest`,
-    JSON.stringify(policy),
-  );
-  await env.POLICY_KV.put(
-    `policy:${organisationId}:v1`,
-    JSON.stringify(policy),
-  );
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId,
-    now,
-  });
-  await organisation.ensureOrganisation({
-    organisationId,
-    name: "Jev settings",
-    plan: "beta",
-    status: "active",
-    createdAt: now,
-  });
-  return {
-    organisationId,
-    owner,
-    accountId: await mailbox(organisationId, owner, name),
-  };
-}
-
-async function mailbox(
-  organisationId: OrganisationId,
-  owner: Client,
-  name: string,
-): Promise<string> {
-  const now = Date.now();
-  const handle = requireVaultHandle(
-    `vault:${organisationId.toLowerCase()}:gmail:${name}:oauth:g1`,
-  );
-  const stored = await storeVaultSecret({
-    db: fixtureDatabase(),
-    keys: env,
-    organisationId,
-    handle,
-    now,
-    secret: {
-      kind: "oauth_tokens",
-      accessToken: "plan-88-e2e-token",
-      refreshToken: "plan-88-e2e-refresh",
-      expiry: { kind: "expires", expiresAt: now + 3_600_000 },
-    },
-  });
-  if (!stored.ok) throw new Error(stored.error.code);
-  const connected = await createActiveConnectedIntegration(fixtureDatabase(), {
-    organisationId,
-    provider: "gmail",
-    authorizationProduct: "full_mailbox_pilot",
-    providerSubjectId: name,
-    environment: "development",
-    authMode: "shared_pantry_app",
-    authority: { kind: "connection_credential", credentialRef: handle },
-    grantedScopes: GMAIL_FULL_MAILBOX_SCOPES,
-    createdByUserId: owner.identity.userId,
-    providerAccountId: name,
-    accountKind: "mailbox",
-    displayName: name,
-    capabilities: [CAPABILITY_KEYS.emailMailboxRead],
-    audiencePolicy: { kind: "operator" },
-    retentionPolicy: { kind: "organisation_default" },
-    now,
-  });
-  const granted = await createAccessGrant({
-    db: fixtureDatabase(),
-    organisationId,
-    grantId: `grant_mail_${name}`,
-    subject: { kind: "organisation_role", role: "owner" },
-    target: {
-      kind: "provider_resource",
-      capabilityId: CAPABILITY_KEYS.emailMailboxRead,
-      capabilityVersion: 1,
-      integrationAccountId: connected.account.integrationAccountId,
-      resourceScope: "mailbox",
-    },
-    provenance: {
-      kind: "baseline",
-      profile: "read_and_propose",
-      profileVersion: 1,
-      materializationReceiptId: "plan-88-e2e",
-    },
-    now,
-  });
-  if (!granted.ok) throw new Error(granted.error.code);
-  return connected.account.integrationAccountId;
-}
-
-async function features(
-  organisationId: OrganisationId,
-  session: IssuedControlSession,
-): Promise<JevFeaturesView> {
-  const response = await controlFetch(
-    organisationId,
-    session,
-    "jev-features",
-    null,
-  );
-  const raw: unknown = await response.json();
-  expect(response.status, JSON.stringify(raw)).toBe(200);
-  if (!isRecord(raw)) throw new Error("Invalid Jev settings answer");
-  return parseJevFeaturesView(raw.value);
-}
-
-async function change(
-  organisationId: OrganisationId,
-  session: IssuedControlSession,
-  body: unknown,
-): Promise<JevFeaturesView> {
-  const response = await post(organisationId, session, body);
-  const raw: unknown = await response.json();
-  expect(response.status, JSON.stringify(raw)).toBe(200);
-  if (!isRecord(raw)) throw new Error("Invalid Jev settings answer");
-  return parseJevFeaturesView(raw.value);
-}
-
-function post(
-  organisationId: OrganisationId,
-  session: IssuedControlSession,
-  body: unknown,
-): Promise<Response> {
-  return controlFetch(organisationId, session, "jev-features", body);
-}
-
-function preview(
-  organisationId: OrganisationId,
-  session: IssuedControlSession,
-  accountId: string,
-  messageIds: readonly string[] = ["m1"],
-): Promise<Response> {
-  return controlFetch(
-    organisationId,
-    session,
-    `mail-inbox/${accountId}/organization`,
-    { kind: "preview", rules: [RULE], messageIds, consent: true },
-  );
 }
 
 async function typeSafeVaultSecrets(

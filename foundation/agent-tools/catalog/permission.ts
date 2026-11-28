@@ -126,6 +126,9 @@ export function permissionRequestDefinition(
         : "") +
       (missing.includes(CAPABILITY_KEYS.jevFeaturesManage)
         ? ` When the work turns a Jev switch on or off, ask for ${CAPABILITY_KEYS.jevFeaturesManage}.`
+        : "") +
+      (missing.includes(CAPABILITY_KEYS.billingAccountRead)
+        ? ` When the work reads the plan, the payment state, the Jev use of the month or the spending limit, ask for ${CAPABILITY_KEYS.billingAccountRead}.`
         : ""),
     strict: true,
     parameters: {

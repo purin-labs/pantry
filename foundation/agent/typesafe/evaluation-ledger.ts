@@ -1,4 +1,5 @@
 import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { definePort } from "@purin-labs/kernel/port";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   sameTypeSafeAuthority,
@@ -15,9 +16,14 @@ import {
   type TypeSafePurpose,
 } from "./usage-store";
 import { isRecord } from "@purin-labs/std";
+import { DEFAULT_PLAN_ID, organisationPlan } from "@purin-labs/tenancy/plans";
 
-/** Plan 88 D3: $1.00 of TypeSafe cost on Pantry's key each UTC month. */
-export const JEV_MONTHLY_ALLOWANCE_MICROUSD = 1_000_000;
+/**
+ * Plan 88 D3: $1.00 of TypeSafe cost on Pantry's key each UTC month. The plan
+ * catalog holds the number (Plan 95).
+ */
+export const JEV_MONTHLY_ALLOWANCE_MICROUSD =
+  organisationPlan(DEFAULT_PLAN_ID).freeJevUseMicrousd;
 /** Plan 88 D8: at most 5 Pantry-funded Jev requests a second for each Organisation. */
 const JEV_REQUESTS_PER_SECOND = 5;
 
@@ -100,9 +106,34 @@ export type TypeSafeUsageError = Readonly<{
     | "inactive"
     | "budget_exhausted"
     | "allowance_reached"
+    | "spending_limit_reached"
+    | "paid_use_unfunded"
     | "rate_limited"
     | "store_invalid";
 }>;
+
+/**
+ * Paid use above the free use of the month (Plan 88 section 4, Plan 95
+ * step 6). The Jev features of the integrations area give it, and the Worker
+ * registers it; the ledger keeps no paid-use row. It admits one Pantry-funded
+ * call that the free use does not cover, or says why the call does not run.
+ * `commit` stores what the admission holds; the ledger calls it in the
+ * transaction of the reservation, after its own checks pass.
+ */
+export type TypeSafePaidUse = (
+  sql: SqlStorage,
+  call: Readonly<{
+    organisationId: OrganisationId;
+    purpose: TypeSafePurpose;
+    reservedInputTokens: number;
+    now: number;
+  }>,
+) => Result<
+  Readonly<{ commit(): void }>,
+  "allowance_reached" | "spending_limit_reached" | "paid_use_unfunded"
+>;
+
+export const typeSafePaidUse = definePort<TypeSafePaidUse>("typesafe_paid_use");
 
 export type TypeSafeEvaluationKey = Readonly<{
   organisationId: OrganisationId;
@@ -195,6 +226,7 @@ export function reserveTypeSafeEvaluation(
     return failure("inactive");
   }
   const limits = authority.limits;
+  let paid: Readonly<{ commit(): void }> | null = null;
   if (authority.funding.kind === "pantry_platform") {
     if (
       readRecentPantryTypeSafeCount(sql, input.organisationId, input.now) >=
@@ -205,10 +237,17 @@ export function reserveTypeSafeEvaluation(
       readMonthlyPantryTypeSafeCost(sql, input.organisationId, input.now) +
         limits.reservationMicrousd >
       JEV_MONTHLY_ALLOWANCE_MICROUSD
-    )
-      // Above the free use only paid use admits a call (Plan 88 section 4),
-      // and paid use is closed until Pantry's own billing (Plan 95 step 6).
-      return failure("allowance_reached");
+    ) {
+      // Above the free use only paid use admits a call (Plan 88 section 4).
+      const admitted = typeSafePaidUse.use()(sql, {
+        organisationId: input.organisationId,
+        purpose: input.purpose,
+        reservedInputTokens: input.reservedInputTokens,
+        now: input.now,
+      });
+      if (!admitted.ok) return failure(admitted.error);
+      paid = admitted.value;
+    }
   }
   const usage = readDailyTypeSafeUsage(
     sql,
@@ -231,6 +270,7 @@ export function reserveTypeSafeEvaluation(
     usage.cost + limits.reservationMicrousd > limits.maxCostMicrousd
   )
     return failure("budget_exhausted");
+  if (paid !== null) paid.commit();
   const expiresAt = input.now + limits.requestTimeoutMs;
   sql.exec(
     `INSERT INTO typesafe_evaluation (

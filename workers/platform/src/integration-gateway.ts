@@ -63,6 +63,7 @@ import {
   handleDiscordInteraction,
 } from "@purin-labs/area-integrations/server/gateway/discord";
 import { handleDropboxWebhook } from "@purin-labs/area-integrations/server/gateway/dropbox-webhook";
+import { handleStripeBillingWebhook } from "@purin-labs/area-organisation/server/gateway/stripe-billing-webhook";
 import { handleEventQueueMessage } from "@purin-labs/surface-webhooks/server/gateway/event-queue";
 import {
   handleConfigureExternalRecordsCredential,
@@ -287,6 +288,8 @@ async function handleRequest(
         return handleCommerceWebhook(request, env, route.organisationIdRaw);
       case "stripeWebhook":
         return handleStripeWebhook(request, env, route.organisationIdRaw);
+      case "stripeBillingWebhook":
+        return handleStripeBillingWebhook(request, env);
       case "shopifyWebhook":
         return SHOPIFY_GATEWAY_ROUTES.webhooks.shopifyWebhook(
           request,

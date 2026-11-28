@@ -18,7 +18,7 @@ import {
   liveDeviceMember,
   type ToolEffect,
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
-import { LogoRequestError, type LogoChangeRequest } from "./logo";
+import { LogoRequestError, type LogoChangeRequest } from "./services";
 
 /**
  * The owner's logo change, as the Logos dialog does it: the person who asked

@@ -456,7 +456,10 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
 - **No failed cleanup.** No code writes `organisation_archive_cleanup.status = 'failed'`.
 - **Labels that differ.** The tombstone names the first active owner, also when an admin
   archives. `OrganisationOnboardingLifecycle` has no `purging` or `purged`.
-- **Billing** (Plan 95 step 6) is not built, and the plan is always `beta`.
+- **Billing** (Plan 95 step 6) is built for paid Jev use (ORG-02) and closed on every
+  deployment until the Purin Stripe account exists. The plan is always `beta`; the plan
+  catalog is `foundation/tenancy/plans.ts`. An archive or a purge does not cancel the
+  Stripe subscription of an Organisation.
 
 ## Sources
 

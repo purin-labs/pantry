@@ -4,49 +4,31 @@
 // chooses the tool call; product code reads the settings, stages the card,
 // refuses the lower role and writes the switch.
 import { exports } from "cloudflare:workers";
-import { http, type HttpResponseResolver } from "msw";
 import { expect, it } from "vitest";
 import {
   parseJevFeaturesView,
   type JevFeaturesView,
 } from "@purin-labs/control-api/portal/jev-features";
-import { newConversationId, type ConversationId } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import {
-  ask,
-  lastCalledTool,
-  pausedRequest,
-  resumeChat,
-} from "./chat-permission-support";
 import { commerceHeaders } from "./commerce-support";
 import { PUBLIC_ORIGIN } from "./hibernatable-socket-support";
 import {
-  createConversation,
   installMemoryFixture,
   postJson,
-  workKind,
   type Member,
   type MemoryFixture,
 } from "./memory-support";
-import { network } from "./network";
-import { allowAsPortal } from "./permission-request-support";
 import { memberMutation } from "./organisation-fixture";
-import {
-  offeredToolNames,
-  openRouterText,
-  openRouterToolCall,
-  requireLastToolOutput,
-} from "./slack-journey-support";
 import { draftAction, onlyDraft } from "./chat-journey-support";
+import {
+  installScriptedModel,
+  lastScriptedOutput,
+  scriptedChat,
+  type ScriptedTools,
+} from "./scripted-agent-support";
 
-type Script = Readonly<{
-  tool: string;
-  args: Record<string, unknown>;
-  ask: readonly string[];
-}>;
-
-const SCRIPTS: Readonly<Record<string, Script>> = {
+const SCRIPTS: ScriptedTools = {
   READJEV: {
     tool: "jev_features_read",
     args: {},
@@ -64,24 +46,13 @@ const SCRIPTS: Readonly<Record<string, Script>> = {
   },
 };
 
-type Journey = {
-  readonly outputs: Record<string, string[]>;
-  readonly offered: Set<string>;
-};
-
 it(
   "J5: the agent reads the Jev settings, turns screen relevance off after the admin approves the card, and a member who is not an admin changes nothing",
   { timeout: 300_000 },
   async (): Promise<void> => {
     const fixture = await installMemoryFixture();
     const { author, reviewer, organisationId } = fixture;
-    const journey: Journey = { outputs: {}, offered: new Set() };
-    network.use(
-      http.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        replyToModel.bind(null, journey),
-      ),
-    );
+    const journey = installScriptedModel(SCRIPTS);
 
     // The owner turns screen relevance on, on Settings › Jev.
     const on = await change(fixture, author, {
@@ -92,8 +63,8 @@ it(
 
     // 1. The read asks first. After the allow, the agent gets the same view
     //    that the page shows.
-    await chat(fixture, author, "READJEV");
-    const read = toolValue(lastOutput(journey, "READJEV"));
+    await scriptedChat(fixture, author, "READJEV");
+    const read = toolValue(lastScriptedOutput(journey, "READJEV"));
     expect(read).toEqual(await features(fixture, author));
     expect(read).toMatchObject({
       funding: "pantry_platform",
@@ -102,8 +73,8 @@ it(
     });
 
     // 2. A change is a card. Nothing changes until the admin approves it.
-    const off = await chat(fixture, author, "SCREENOFF");
-    expect(lastOutput(journey, "SCREENOFF")).toContain("configuration_drafted");
+    const off = await scriptedChat(fixture, author, "SCREENOFF");
+    expect(lastScriptedOutput(journey, "SCREENOFF")).toContain("configuration_drafted");
     expect((await features(fixture, author)).screenRelevance.enabled).toBe(
       true,
     );
@@ -130,7 +101,7 @@ it(
 
     // 3. A second admin asks to turn it on again, and then loses the admin
     //    role. The card refuses that person, and the switch stays off.
-    const onAgain = await chat(fixture, reviewer, "SCREENON");
+    const onAgain = await scriptedChat(fixture, reviewer, "SCREENON");
     const onCard = await onlyDraft(fixture, reviewer, onAgain);
     expect(onCard.summary).toBe("Turn on Screen relevance in Settings › Jev.");
     const demoted = await memberMutation(
@@ -184,60 +155,6 @@ function toolValue(raw: string): JevFeaturesView {
   return parseJevFeaturesView(JSON.parse(message.output));
 }
 
-function lastOutput(journey: Journey, word: string): string {
-  const output = journey.outputs[word]?.at(-1);
-  if (output === undefined) throw new Error(`No output for ${word}`);
-  return output;
-}
-
-/**
- * One chat message. A turn that pauses on a permission request is allowed by
- * the person in place, and the same step runs again.
- */
-async function chat(
-  fixture: MemoryFixture,
-  person: Member,
-  word: string,
-): Promise<ConversationId> {
-  const conversationId = newConversationId();
-  await createConversation(person, conversationId, fixture.route);
-  await ask(
-    person,
-    fixture.paths.chat,
-    conversationId,
-    fixture.route.model,
-    `${word} now.`,
-    word,
-  );
-  await expect
-    .poll(workKind.bind(null, person, conversationId), { timeout: 60_000 })
-    .toMatch(/^(ready|awaiting_permission)$/u);
-  if ((await workKind(person, conversationId)) === "awaiting_permission") {
-    const pause = await pausedRequest(
-      person,
-      fixture.paths.chat,
-      conversationId,
-    );
-    const allowed = await allowAsPortal(
-      person.organisationId,
-      person.session,
-      pause.id,
-    );
-    expect(allowed.status, await allowed.clone().text()).toBe(200);
-    const resumed = await resumeChat(
-      person,
-      fixture.paths.chat,
-      conversationId,
-      pause.id,
-    );
-    expect(resumed.status, JSON.stringify(resumed.body)).toBe(200);
-    await expect
-      .poll(workKind.bind(null, person, conversationId), { timeout: 60_000 })
-      .toBe("ready");
-  }
-  return conversationId;
-}
-
 async function features(
   fixture: MemoryFixture,
   person: Member,
@@ -277,68 +194,4 @@ function controlFetch(
       body: body === null ? null : JSON.stringify(body),
     },
   );
-}
-
-function messageWord(body: Record<string, unknown>): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message: unknown = messages[index];
-    if (!isRecord(message) || message.role !== "user") continue;
-    const text = JSON.stringify(message.content);
-    const word = Object.keys(SCRIPTS).find((candidate) =>
-      text.includes(candidate),
-    );
-    if (word !== undefined) return word;
-  }
-  throw new Error("The model request has no scripted message");
-}
-
-let replies = 0;
-
-/** The fake model chooses the tool call; it never writes a tool's value. */
-async function replyToModel(
-  journey: Journey,
-  { request }: Parameters<HttpResponseResolver>[0],
-): Promise<Response> {
-  const body: unknown = await request.json();
-  if (!isRecord(body)) throw new Error("Invalid model request");
-  replies += 1;
-  const id = `jev_${String(replies)}`;
-  const reply = (text: string): Response =>
-    openRouterText(JSON.stringify({ kind: "reply", text }), id);
-  for (const name of offeredToolNames(body)) journey.offered.add(name);
-  const word = messageWord(body);
-  const script = SCRIPTS[word];
-  if (script === undefined) throw new Error(`No script for ${word}`);
-  const called = lastCalledTool(body);
-  const callTool = (): Response =>
-    openRouterToolCall(script.tool, script.args, `call_${id}`);
-  if (called === null)
-    return offeredToolNames(body).includes(script.tool)
-      ? callTool()
-      : openRouterToolCall(
-          "tool_search",
-          { query: script.tool, limit: 1 },
-          `call_${id}`,
-        );
-  const output = requireLastToolOutput(body);
-  switch (called) {
-    case "tool_search":
-      if (offeredToolNames(body).includes(script.tool)) return callTool();
-      return openRouterToolCall(
-        "request_permission",
-        { capabilityIds: script.ask, entityTypeReads: [] },
-        `call_${id}`,
-      );
-    case "request_permission":
-      expect(output).toContain("Allow prompt");
-      return reply("I asked for permission.");
-    case script.tool:
-      if (output.includes("Allow prompt"))
-        return reply("I asked for permission.");
-      journey.outputs[word] = [...(journey.outputs[word] ?? []), output];
-      return reply(`Finished ${word}.`);
-    default:
-      throw new Error(`Unexpected tool ${called} for ${word}`);
-  }
 }

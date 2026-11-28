@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router";
 import type {
   JevAllowance,
   JevFeaturesView,
@@ -10,15 +9,14 @@ import { JevFacts } from "./facts";
 
 /**
  * Paid Jev use above the free use, and the prompt at 80 % and 100 % of the
- * free use (Plan 88 section 4). Settings › Jev and Settings › Billing share
- * these parts.
+ * free use (Plan 88 section 4), for Settings › Jev. Settings › Billing shares
+ * the money formats and the id of the section.
  */
 
 /** The id of the Paid use section; `#jev-paid-use` opens it. */
 export const JEV_PAID_USE_ID = "jev-paid-use";
 
 const PROMPT_SHARE = 0.8;
-const MAX_LIMIT_MINOR = 100_000;
 
 export function resetDate(allowance: JevAllowance): string {
   return new Date(allowance.resetsAt).toLocaleDateString(undefined, {
@@ -47,16 +45,21 @@ function promptDue(view: JevFeaturesView): boolean {
   );
 }
 
-/** "$5" or "5.00" to US cents, or null when it is not a valid limit. */
-function parseLimit(text: string): number | null {
+/**
+ * "$5" or "5.00" to US cents, or null when it is not a valid limit. The
+ * highest limit comes from the Organisation's plan.
+ */
+function parseLimit(text: string, highestMinor: number): number | null {
   const match = /^\s*\$?\s*(\d{1,4})(?:\.(\d{1,2}))?\s*$/.exec(text);
   if (match === null) return null;
   const minor =
     Number(match[1]) * 100 + Number((match[2] ?? "0").padEnd(2, "0"));
-  return minor >= 1 && minor <= MAX_LIMIT_MINOR ? minor : null;
+  return minor >= 1 && minor <= highestMinor ? minor : null;
 }
 
-const LIMIT_HINT = "Enter a spending limit from $0.01 to $1,000.00.";
+function limitHint(highestMinor: number): string {
+  return `Enter a spending limit from $0.01 to ${cents(highestMinor)}.`;
+}
 
 /**
  * One line at 80 % or 100 % of the free use. The owner gets "Turn on paid
@@ -65,9 +68,8 @@ const LIMIT_HINT = "Enter a spending limit from $0.01 to $1,000.00.";
 export function JevUsePrompt(props: {
   readonly view: JevFeaturesView;
   readonly isOwner: boolean;
-  readonly turnOn: Readonly<
-    { kind: "focus"; onClick: () => void } | { kind: "link"; href: string }
-  >;
+  /** Moves the owner to the Paid use switch. */
+  readonly onTurnOn: () => void;
 }): React.ReactNode {
   const { view } = props;
   if (!promptDue(view) || view.allowance === null) return null;
@@ -80,26 +82,16 @@ export function JevUsePrompt(props: {
         {props.isOwner ? null : " Ask the owner to turn on paid use."}
       </span>
       {props.isOwner ? (
-        props.turnOn.kind === "focus" ? (
-          <button
-            type="button"
-            className="secondary"
-            onClick={props.turnOn.onClick}
-          >
-            Turn on paid use
-          </button>
-        ) : (
-          <Link className="jev-prompt-link" to={props.turnOn.href}>
-            Turn on paid use
-          </Link>
-        )
+        <button type="button" className="secondary" onClick={props.onTurnOn}>
+          Turn on paid use
+        </button>
       ) : null}
     </p>
   );
 }
 
 /** Why paid use cannot start yet, or null when it is open. */
-export function pricedNote(priced: boolean): string | null {
+function pricedNote(priced: boolean): string | null {
   return priced
     ? null
     : "Paid Jev use is not open yet. It opens when Purin Pantry billing starts.";
@@ -110,8 +102,7 @@ function SpendingLimitReached(props: {
   readonly view: JevFeaturesView;
 }): React.ReactNode {
   const { paidUse, allowance } = props.view;
-  if (!paidUse.enabled || paidUse.spentMinor < paidUse.spendingLimitMinor)
-    return null;
+  if (!paidUse.limitReached) return null;
   return (
     <p className="jev-warning" role="status">
       Jev reached the spending limit.{" "}
@@ -148,10 +139,13 @@ export function PaidUseSection(props: {
   }, [paidUse.spendingLimitMinor]);
 
   const send = async (enabled: boolean): Promise<void> => {
-    const spendingLimitMinor = parseLimit(limit);
+    const spendingLimitMinor = parseLimit(
+      limit,
+      paidUse.highestSpendingLimitMinor,
+    );
     setSaved(false);
     if (spendingLimitMinor === null) {
-      setError(LIMIT_HINT);
+      setError(limitHint(paidUse.highestSpendingLimitMinor));
       return;
     }
     setBusy(true);
@@ -174,7 +168,9 @@ export function PaidUseSection(props: {
   const note = pricedNote(paidUse.priced);
   // A person can always turn paid use off; turning it on needs the price.
   const switchDisabled = !isOwner || (!paidUse.enabled && !paidUse.priced);
-  const limitChanged = parseLimit(limit) !== paidUse.spendingLimitMinor;
+  const limitChanged =
+    parseLimit(limit, paidUse.highestSpendingLimitMinor) !==
+    paidUse.spendingLimitMinor;
 
   return (
     <section
@@ -210,7 +206,9 @@ export function PaidUseSection(props: {
           ["Price", "$0.084 for each million input tokens"],
           [
             "How you pay",
-            "Through Purin Pantry billing, which has not started yet.",
+            paidUse.priced
+              ? "Stripe sends an invoice each month. The owner sets up payment in Settings › Billing first."
+              : "Through Purin Pantry billing, which has not started yet.",
           ],
           ...(paidUse.enabled
             ? [
@@ -268,7 +266,8 @@ export function PaidUseSection(props: {
             Save
           </button>
           <span id="jev-spending-limit-hint" className="jev-muted">
-            At the limit, Jev stops until the next month.
+            At the limit, Jev stops until the next month. The highest limit is{" "}
+            {cents(paidUse.highestSpendingLimitMinor)}.
           </span>
         </form>
       ) : null}
