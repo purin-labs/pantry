@@ -28,13 +28,7 @@ import {
 } from "@purin-labs/bakery-workflow/draft";
 import { proposalChangeSummary } from "@purin-labs/bakery-workflow/changes";
 import type { RunFinding } from "@purin-labs/bakery-workflow/findings";
-import type { TaskView } from "@purin-labs/production-simulation";
-import {
-  NODE_COLUMN,
-  NODE_HEIGHT,
-  NODE_ROW,
-  NODE_WIDTH,
-} from "@purin-labs/bakery-workflow/layout";
+import { NODE_COLUMN, NODE_ROW } from "@purin-labs/bakery-workflow/layout";
 import {
   DRAFT_LABEL_LIMIT,
   WorkflowDraftDoc,
@@ -43,14 +37,8 @@ import {
   type DraftSnapshot,
 } from "@purin-labs/workflow-canvas-crdt/draft";
 import {
-  ArrowUp,
-  Bot,
-  Check,
-  CircleAlert,
-  Cog,
   GitBranch,
   Hand,
-  Layers,
   Minus,
   MousePointer2,
   Play,
@@ -64,12 +52,8 @@ import {
   X,
 } from "lucide-react";
 import React from "react";
-import {
-  GraphSelect,
-  graphChoice,
-  type GraphChoice,
-} from "./recipe-graph-select";
-import { animationPlan, type AnimationPlanBuilder } from "./recipe-clock";
+import { GraphSelect, graphChoice } from "./recipe-graph-select";
+import type { AnimationPlanBuilder } from "./recipe-clock";
 import {
   runDraftComparison,
   type DraftComparison,
@@ -81,14 +65,11 @@ import {
   recipeOverview,
   type RecipeOverviewNode,
   type RecipeGraph,
-  type RecipeGraphEdge,
   type RecipeGraphNode,
   type RecipeGraphSource,
   type RecipeSource,
 } from "./recipe-graph";
 import { clampPosition, freePosition, hasEdge } from "./draft-placement";
-import { taskSpans, type Span } from "./oven-task-views";
-import { seconds } from "./oven-logistics";
 import {
   RecipeWorkspaceContext,
   applyWorkflow,
@@ -98,7 +79,6 @@ import {
   readProposedDocument,
   recipeWorkflowId,
   recordRunFindings,
-  type ProposalDecision,
   type RecipeWorkspace,
   type WorkflowProposal,
 } from "./recipe-workspace";
@@ -108,47 +88,60 @@ import {
 } from "./workflow-draft-client";
 import "./recipe-workflow-graph.css";
 import type { Variant } from "@purin-labs/type-utils";
+import {
+  buildPlan,
+  changeItem,
+  decisionText,
+  findingItem,
+  findingText,
+  graphNodeMatches,
+  ignoreFailure,
+  isOtherThan,
+  isOutcome,
+  kindIcon,
+  nodeMatches,
+  nodeState,
+  overviewEdge,
+  port,
+  portIcon,
+  problemIsAt,
+  problemItem,
+  removedLabel,
+  roleLabel,
+  secondsText,
+  simulatedText,
+  skippedKeys,
+  stageMatches,
+  stateMark,
+  stepDoer,
+  taskTimeline,
+  trimmed,
+  workflowChoice,
+} from "./recipe-graph-marks";
+import type { RecipeGraphStage } from "./recipe-graph-marks";
+import {
+  HEIGHT,
+  WIDTH,
+  chromeOffsets,
+  edgeEndsAt,
+  edgeKind,
+  edgePath,
+  edgeStartsAt,
+  isIntersecting,
+} from "./recipe-graph-wires";
+import type { ChromeParts } from "./recipe-graph-wires";
+import { AgentComposer } from "./recipe-graph-composer";
+export type { RecipeGraphStage } from "./recipe-graph-marks";
 
 /** A larger recipe opens on one workflow. The whole of it can still show. */
 const LARGE_RECIPE_STEPS = 64;
 const OVERVIEW = "__overview";
-const WIDTH = NODE_WIDTH;
-const HEIGHT = NODE_HEIGHT;
-/** A wire is a curve when it has this much room, and it runs through a gap otherwise. */
-const WIRE_REACH = 14;
-const WIRE_CORNER = 14;
-/** From the edge of a card to the centre of its port. */
-const PORT_CENTRE = 15;
-/** The label above a step: its kind and its seconds. */
-const LABEL_ROOM = 20;
 const ZOOM_MIN = 0.4;
 const ZOOM_MAX = 1.5;
 const ZOOM_STEP = 0.1;
 /** The width that a side panel covers, and the room that a port needs beside it. */
 const PANEL_ROOM = 364;
 const PORT_ROOM = 30;
-/** The floating bars stand 12px from the edge of the workspace, 8px apart. */
-const CHROME_EDGE = 12;
-const CHROME_GAP = 8;
-const COMPOSER_EXAMPLE_MS = 6000;
-const COMPOSER_EXAMPLES = [
-  "Add a check after the last step",
-  "Shorten the longest wait",
-  "Find what makes this recipe late",
-];
-
-/** What flows out of a step. A port and its wire share the color and the icon. */
-type PortKind = RecipeGraphNode["role"] | "workflow";
-
-export type RecipeGraphStage = Readonly<{
-  id: string;
-  /** The stage's card state, which a step shows as its own. */
-  state: string;
-  stateLabel: string;
-  startS: number;
-  endS: number;
-  reached: boolean;
-}>;
 
 type Props = Readonly<{
   source: RecipeGraphSource;
@@ -180,21 +173,6 @@ type RunState =
   | Readonly<{ kind: "running" }>
   | Readonly<{ kind: "done"; comparison: DraftComparison }>
   | Readonly<{ kind: "failed"; message: string }>;
-
-/** A proposal that a person reviews. The shared draft stays as it is under it. */
-type ChromeParts = Readonly<
-  Record<
-    | "header"
-    | "end"
-    | "stages"
-    | "summary"
-    | "footer"
-    | "notices"
-    | "tools"
-    | "result",
-    Element | null
-  >
->;
 
 type OpenProposal = Readonly<{
   proposal: WorkflowProposal;
@@ -2440,568 +2418,5 @@ export class RecipeWorkflowGraph extends React.Component<Props, State> {
         )}
       </React.Fragment>
     );
-  }
-}
-
-/** The words go to the chat as a draft. A person reads them there and sends them. */
-function AgentComposer(
-  props: Readonly<{ chatPath: string; workflowId: string }>,
-): React.ReactNode {
-  const [words, setWords] = React.useState("");
-  const [example, setExample] = React.useState(0);
-  React.useEffect(() => {
-    const timer = window.setInterval(() => {
-      setExample((value) => (value + 1) % COMPOSER_EXAMPLES.length);
-    }, COMPOSER_EXAMPLE_MS);
-    return () => {
-      window.clearInterval(timer);
-    };
-  }, []);
-  const asked = words.trim();
-  function submit(event: React.FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-    if (asked === "") return;
-    askAgentInChat(
-      props.chatPath,
-      `Read the recipe workflow ${props.workflowId}, and propose a change. ${asked}`,
-    );
-  }
-  return (
-    <form
-      className="recipe-graph-float recipe-graph-composer"
-      onSubmit={submit}
-    >
-      <Sparkles size={16} aria-hidden="true" />
-      <input
-        aria-label="Tell the agent what to change"
-        placeholder={COMPOSER_EXAMPLES[example]}
-        value={words}
-        onChange={(event) => {
-          setWords(event.currentTarget.value);
-        }}
-      />
-      <button
-        type="submit"
-        aria-label="Continue in chat"
-        disabled={asked === ""}
-      >
-        <ArrowUp size={16} aria-hidden="true" />
-      </button>
-    </form>
-  );
-}
-
-function buildPlan(
-  binding: NonNullable<RecipeSource["binding"]>,
-  base: DraftSnapshot,
-  snapshot: DraftSnapshot,
-  skipped: ReadonlySet<string>,
-  stages: Parameters<AnimationPlanBuilder>[0],
-): ReturnType<AnimationPlanBuilder> {
-  return animationPlan(stages, binding, base, snapshot, skipped);
-}
-
-/**
- * One lane for each task that ran, named by its step. A task of a step that the
- * draft added takes the accent, so the reader finds the change on the timeline.
- */
-function taskTimeline(
-  tasks: readonly TaskView[],
-  end: number,
-  run: "Draft" | "Proposal",
-  graph: RecipeGraph,
-  diff: WorkflowDiff,
-): React.ReactNode {
-  const steps = new Map<string, RecipeGraphNode>();
-  for (const node of graph.nodes) steps.set(node.key, node);
-  const horizon = Math.max(end, 1);
-  const rows: React.ReactNode[] = [];
-  for (const task of tasks) {
-    const spans = taskSpans(task, end);
-    if (spans.length === 0) continue;
-    const step =
-      task.subject.kind === "workflow"
-        ? steps.get(task.subject.key)
-        : undefined;
-    const name = step?.label ?? task.id;
-    rows.push(
-      <li
-        key={task.id}
-        data-timeline-task={task.id}
-        data-added={step !== undefined && diff.added.has(step.id)}
-      >
-        <span title={task.id}>{name}</span>
-        <span className="recipe-graph-lane">
-          {spans.map(timelineBar.bind(null, name, horizon, step))}
-        </span>
-      </li>,
-    );
-  }
-  return (
-    <section aria-label="Task timeline">
-      <header>
-        <h3>Task timeline</h3>
-        <span>
-          {run} · 0–{Number(seconds(end)).toFixed(1)} s
-        </span>
-      </header>
-      <ol className="recipe-graph-timeline">{rows}</ol>
-    </section>
-  );
-}
-
-function timelineBar(
-  name: string,
-  horizon: number,
-  step: RecipeGraphNode | undefined,
-  span: Span,
-): React.ReactNode {
-  const from = Number(seconds(span.start)).toFixed(1);
-  const to = Number(seconds(span.end)).toFixed(1);
-  return (
-    <span
-      key={span.phase}
-      className="recipe-graph-bar"
-      data-kind={step?.role ?? "work"}
-      data-phase={span.phase}
-      title={`${name}: ${span.phase} ${from}–${to} s`}
-      style={{
-        insetInlineStart: `${(span.start / horizon) * 100}%`,
-        width: `${((span.end - span.start) / horizon) * 100}%`,
-      }}
-    >
-      <span className="recipe-graph-hidden">
-        {span.phase} {from}–{to} s
-      </span>
-    </span>
-  );
-}
-
-/** Steps that a decision skipped in every instance of the run. */
-function skippedKeys(run: DraftComparison["draft"]): ReadonlySet<string> {
-  const skipped = new Set<string>();
-  const ran = new Set<string>();
-  if (run.logistics.kind === "available")
-    for (const task of run.logistics.tasks) {
-      if (task.subject.kind !== "workflow") continue;
-      (task.kind === "skipped" ? skipped : ran).add(task.subject.key);
-    }
-  for (const key of ran) skipped.delete(key);
-  return skipped;
-}
-
-function overviewEdge(
-  places: ReadonlyMap<string, RecipeOverviewNode>,
-  edge: Readonly<{ from: string; to: string }>,
-): React.ReactNode {
-  const from = places.get(edge.from);
-  const to = places.get(edge.to);
-  if (from === undefined || to === undefined) return null;
-  return (
-    <g key={`${edge.from} ${edge.to}`} data-kind="workflow">
-      <path d={wireRoute(from, to).d} />
-    </g>
-  );
-}
-
-function ignoreFailure(): void {}
-
-function decisionText(decision: ProposalDecision): string {
-  switch (decision.kind) {
-    case "approved":
-      return `Applied revision ${String(decision.revision)}. New runs use it.`;
-    case "declined":
-      return "You declined the proposal. Nothing changed.";
-    case "stale":
-      return "The recipe changed after this proposal, so it did not apply. Ask the agent again.";
-    case "human_intervention":
-      return "A person changed the same steps in the draft, so the proposal did not apply. Apply or undo that work, and ask the agent again.";
-    case "closed":
-      return "This proposal is already closed.";
-  }
-}
-
-function findingItem(finding: RunFinding): React.ReactNode {
-  return <li key={finding.id}>{findingText(finding)}</li>;
-}
-
-function findingText(finding: RunFinding): string {
-  switch (finding.kind) {
-    case "late_order":
-      return finding.waitSeconds === null
-        ? `${finding.subject} did not finish.`
-        : `${finding.subject} waited ${Math.round(finding.waitSeconds)} s.`;
-    case "decision_rejected":
-      return `${finding.subject}: the decision rejected.`;
-    case "task_failed":
-    case "recovery_failed":
-      return `${finding.subject} failed at ${Math.round(finding.atSeconds)} s.`;
-    case "run_blocked":
-      return `The run stopped at ${Math.round(finding.atSeconds)} s. It needs ${finding.subject}.`;
-  }
-}
-
-function changeItem(kind: string, label: string): React.ReactNode {
-  return (
-    <li key={`${kind}/${label}`}>
-      {kind}: {label}
-    </li>
-  );
-}
-
-function simulatedText(comparison: DraftComparison): string {
-  const { applied, draft } = comparison;
-  const parts = [
-    `Simulated. End ${applied.endSeconds.toFixed(1)} s → ${draft.endSeconds.toFixed(1)} s.`,
-  ];
-  if (applied.orders + draft.orders > 0)
-    parts.push(`Late orders ${applied.lateOrders} → ${draft.lateOrders}.`);
-  return parts.join(" ");
-}
-
-/**
- * The header and the draft group share the first row when both fit, and the group
- * moves under the header when they do not. The stages and the summary stack below
- * them; the tools sit on the footer.
- */
-function chromeOffsets(
-  parts: ChromeParts,
-  width: number,
-  workspaceWidth = width,
-): ReadonlyArray<readonly [string, number]> {
-  const beside =
-    shownWidth(parts.header) + shownWidth(parts.end) + CHROME_EDGE * 3 <= width;
-  const endTop = beside ? CHROME_EDGE : below(CHROME_EDGE, parts.header);
-  const row = Math.max(shownHeight(parts.header), shownHeight(parts.end));
-  const top = !beside
-    ? below(endTop, parts.end)
-    : row === 0
-      ? CHROME_EDGE
-      : CHROME_EDGE + row + CHROME_GAP;
-  const summary = below(top, parts.stages);
-  const statusCrowded =
-    CHROME_EDGE + shownWidth(parts.header) + CHROME_GAP >
-    workspaceWidth - 340;
-  const statusTop = statusCrowded
-    ? Math.max(64, below(CHROME_EDGE, parts.header))
-    : 64;
-  return [
-    ["--chrome-end-top", endTop],
-    ["--chrome-top", top],
-    ["--chrome-summary-top", summary],
-    ["--chrome-stack", below(summary, parts.summary)],
-    ["--chrome-bottom", below(CHROME_EDGE, parts.footer)],
-    ["--chrome-status-top", statusTop],
-    ["--notices-height", shownHeight(parts.notices)],
-    ["--tools-height", shownHeight(parts.tools)],
-    ["--result-height", below(0, parts.result)],
-  ];
-}
-
-function below(top: number, part: Element | null): number {
-  const height = shownHeight(part);
-  return height === 0 ? top : top + height + CHROME_GAP;
-}
-
-function shownHeight(part: Element | null): number {
-  return part instanceof HTMLElement ? part.offsetHeight : 0;
-}
-
-function shownWidth(part: Element | null): number {
-  return part instanceof HTMLElement ? part.offsetWidth : 0;
-}
-
-function isIntersecting(entry: IntersectionObserverEntry): boolean {
-  return entry.isIntersecting;
-}
-
-function workflowChoice(workflow: Readonly<{ id: string }>): GraphChoice {
-  return graphChoice(workflow.id);
-}
-
-function trimmed(text: string): string {
-  return text.trim();
-}
-
-function isOutcome(text: string): text is "accept" | "reject" {
-  return text === "accept" || text === "reject";
-}
-
-function isOtherThan(worker: string, item: string): boolean {
-  return item !== worker;
-}
-
-function nodeMatches(id: string | null, node: DraftNode): boolean {
-  return id !== null && draftNodeId(node.workflow, node.key) === id;
-}
-
-function graphNodeMatches(id: string, node: RecipeGraphNode): boolean {
-  return node.id === id;
-}
-
-function problemIsAt(id: string, problem: DraftProblem): boolean {
-  return problem.node === id;
-}
-
-function removedLabel(item: Readonly<{ label: string }>): string {
-  return item.label;
-}
-
-function problemItem(problem: DraftProblem, index: number): React.ReactNode {
-  return <li key={index}>{problem.message}</li>;
-}
-
-type Point = Readonly<{ x: number; y: number }>;
-type Wire = Readonly<{ d: string; label: Point }>;
-
-/**
- * A wire leaves the port on the right of a step and enters the port on the left of
- * the step that needs it. To the next column it bends in the gap between the two. Any
- * other wire would cross the steps between its ends, so it runs only in the gaps: to
- * the middle of the gap beside its step, along the gap above the row of the step that
- * needs it, and back down that step's gap to its port.
- */
-function wireRoute(from: Point, to: Point): Wire {
-  const x1 = from.x + WIDTH + PORT_CENTRE;
-  const y1 = from.y + HEIGHT / 2;
-  const x2 = to.x - PORT_CENTRE;
-  const y2 = to.y + HEIGHT / 2;
-  if (x2 - x1 >= WIRE_REACH && to.x - from.x <= NODE_COLUMN) {
-    const bend = Math.max(WIRE_REACH, (x2 - x1) / 2);
-    return {
-      d: `M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`,
-      label: { x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 6 },
-    };
-  }
-  const gap = (NODE_COLUMN - WIDTH) / 2;
-  const out = from.x + WIDTH + gap;
-  const into = to.x - gap;
-  // The lane runs in the gap above the row, clear of the labels of that row.
-  const lane = to.y - LABEL_ROOM - (NODE_ROW - HEIGHT - LABEL_ROOM) / 2;
-  return {
-    d: roundedPath([
-      { x: x1, y: y1 },
-      { x: out, y: y1 },
-      { x: out, y: lane },
-      { x: into, y: lane },
-      { x: into, y: y2 },
-      { x: x2, y: y2 },
-    ]),
-    label: { x: (out + into) / 2, y: lane - 4 },
-  };
-}
-
-/** Straight segments through the points, with a round corner at each turn. */
-function roundedPath(points: readonly Point[]): string {
-  const kept: Point[] = [];
-  for (const point of points) {
-    const last = kept.at(-1);
-    if (last === undefined || last.x !== point.x || last.y !== point.y)
-      kept.push(point);
-  }
-  const first = kept[0];
-  if (first === undefined) return "";
-  const parts = [`M ${first.x} ${first.y}`];
-  for (let index = 1; index < kept.length - 1; index++) {
-    const before = kept[index - 1];
-    const corner = kept[index];
-    const after = kept[index + 1];
-    if (before === undefined || corner === undefined || after === undefined)
-      continue;
-    const into = Math.hypot(corner.x - before.x, corner.y - before.y);
-    const away = Math.hypot(after.x - corner.x, after.y - corner.y);
-    const radius = Math.min(WIRE_CORNER, into / 2, away / 2);
-    parts.push(
-      `L ${corner.x + ((before.x - corner.x) / into) * radius} ${corner.y + ((before.y - corner.y) / into) * radius}`,
-      `Q ${corner.x} ${corner.y}, ${corner.x + ((after.x - corner.x) / away) * radius} ${corner.y + ((after.y - corner.y) / away) * radius}`,
-    );
-  }
-  const last = kept.at(-1);
-  if (last !== undefined && kept.length > 1)
-    parts.push(`L ${last.x} ${last.y}`);
-  return parts.join(" ");
-}
-
-function edgePath(
-  nodes: ReadonlyMap<string, RecipeGraphNode>,
-  edge: RecipeGraphEdge,
-): React.ReactNode {
-  const source = nodes.get(edge.from);
-  const target = nodes.get(edge.to);
-  if (source === undefined || target === undefined) return null;
-  const wire = wireRoute(source, target);
-  return (
-    <g
-      key={`${edge.from}:${edge.to}`}
-      data-prerequisite={edge.from}
-      data-dependent={edge.to}
-      data-branch={edge.branch ?? undefined}
-      data-kind={edgeKind(nodes, edge)}
-    >
-      <path d={wire.d} />
-      {edge.branch !== null && (
-        <text x={wire.label.x} y={wire.label.y} textAnchor="middle">
-          {edge.branch === "accept" ? "Accept" : "Reject"}
-        </text>
-      )}
-    </g>
-  );
-}
-
-function edgeEndsAt(id: string, edge: Readonly<{ to: string }>): boolean {
-  return edge.to === id;
-}
-
-function edgeStartsAt(id: string, edge: Readonly<{ from: string }>): boolean {
-  return edge.from === id;
-}
-
-/** A branch shows its outcome, and any other wire shows the step it leaves. */
-function edgeKind(
-  nodes: ReadonlyMap<string, RecipeGraphNode>,
-  edge: RecipeGraphEdge,
-): PortKind {
-  return edge.branch ?? nodes.get(edge.from)?.role ?? "work";
-}
-
-function port(side: "in" | "out", kind: PortKind): React.ReactNode {
-  return (
-    <span
-      className="recipe-graph-port"
-      data-side={side}
-      data-kind={kind}
-      aria-hidden="true"
-    >
-      {portIcon(kind, 10)}
-    </span>
-  );
-}
-
-/** The tile on a card names its kind in the same hue as its ports. */
-function kindIcon(kind: PortKind): React.ReactNode {
-  return (
-    <span className="recipe-graph-kind" data-kind={kind} aria-hidden="true">
-      {portIcon(kind, 16)}
-    </span>
-  );
-}
-
-function portIcon(kind: PortKind, size = 12): React.ReactNode {
-  switch (kind) {
-    case "work":
-      return <User size={size} strokeWidth={2} />;
-    case "process":
-      return <Timer size={size} strokeWidth={2} />;
-    case "machine":
-      return <Cog size={size} strokeWidth={2} />;
-    case "robot":
-      return <Bot size={size} strokeWidth={2} />;
-    case "check":
-      return <GitBranch size={size} strokeWidth={2} />;
-    case "accept":
-      return <Check size={size} strokeWidth={2} />;
-    case "reject":
-      return <X size={size} strokeWidth={2} />;
-    case "workflow":
-      return <Layers size={size} strokeWidth={2} />;
-  }
-}
-
-/** The corner mark repeats the state word, so a run reads at a glance. */
-function stateMark(state: string): React.ReactNode {
-  switch (state) {
-    case "current":
-      return (
-        <span
-          className="recipe-graph-mark"
-          data-mark="current"
-          aria-hidden="true"
-        />
-      );
-    case "done":
-      return (
-        <span className="recipe-graph-mark" data-mark="done" aria-hidden="true">
-          <Check size={10} strokeWidth={3} />
-        </span>
-      );
-    case "failed":
-      return (
-        <span
-          className="recipe-graph-mark"
-          data-mark="failed"
-          aria-hidden="true"
-        >
-          <CircleAlert size={14} strokeWidth={2.25} />
-        </span>
-      );
-    default:
-      return null;
-  }
-}
-
-function stageMatches(
-  node: Readonly<{ stages: readonly string[] }>,
-  stage: RecipeGraphStage,
-): boolean {
-  return node.stages.includes(stage.id);
-}
-
-/** A step that spans several stages runs from its first until its last is done. */
-function nodeState(
-  stages: readonly RecipeGraphStage[],
-): Pick<RecipeGraphStage, "state" | "stateLabel"> {
-  for (const wanted of ["failed", "current"]) {
-    const found = stages.find(stageInState.bind(null, wanted));
-    if (found !== undefined) return found;
-  }
-  const done = stages.filter(stageInState.bind(null, "done"));
-  const last = stages.at(-1);
-  if (last === undefined) return { state: "not-started", stateLabel: "" };
-  if (done.length === stages.length || done.length === 0) return last;
-  return { state: "current", stateLabel: "Current" };
-}
-
-function stageInState(state: string, stage: RecipeGraphStage): boolean {
-  return stage.state === state;
-}
-
-/** Who or what does a step: its workers, or else the equipment that it holds. */
-function stepDoer(body: DraftNode["body"]): string {
-  const workers = stepWorkers(body);
-  if (workers !== null && workers.length > 0) return workers.join(", ");
-  const held: string[] = [];
-  if (Array.isArray(body.claims))
-    for (const claim of body.claims as readonly unknown[])
-      if (
-        typeof claim === "object" &&
-        claim !== null &&
-        typeof (claim as { resource?: unknown }).resource === "string"
-      )
-        held.push((claim as { resource: string }).resource);
-  return held.join(", ");
-}
-
-function secondsText(seconds: number): string {
-  if (seconds < 60) return `${Number(seconds.toFixed(1))} s`;
-  if (seconds < 3600) return `${Number((seconds / 60).toFixed(1))} min`;
-  return `${Number((seconds / 3600).toFixed(1))} h`;
-}
-
-function roleLabel(role: RecipeGraphNode["role"]): string {
-  switch (role) {
-    case "work":
-      return "Work";
-    case "process":
-      return "Process";
-    case "machine":
-      return "Machine";
-    case "robot":
-      return "Robot";
-    case "check":
-      return "Check";
-    case "accept":
-      return "If accepted";
-    case "reject":
-      return "If rejected";
   }
 }
